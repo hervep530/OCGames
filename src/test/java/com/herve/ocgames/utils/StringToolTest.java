@@ -49,7 +49,7 @@ class StringToolTest {
     @Test
     public void Given_StringContainsMultipleEqualAndTheMatchingPattern_When_StringOperationsMatch_Then_ReturnTrue(){
         boolean isMatch = StringTool.match("====", "^={4,}$");
-        assertEquals(true, isMatch);
+        assertTrue(isMatch);
     }
 
     @Test
@@ -57,7 +57,7 @@ class StringToolTest {
         String currentString = "{\"operation\";(98+2)*45 -> 4500}";
         String pattern = "^\\{\\\"operation\\\";\\([0-9]{1,3}\\+[0-9]{1,2}\\)\\*[0-9]{1,4} -> [0-9]{1,}\\}$";
         boolean isMatch = StringTool.match(currentString, pattern);
-        assertEquals(true, isMatch);
+        assertTrue(isMatch);
     }
 
     @Test
@@ -65,28 +65,28 @@ class StringToolTest {
         String currentString = "(98+2)*45 -> 4500";
         String pattern = "([0-9]{1,3}+[0-9]{1,3})*100 -> [0-9]{1,9}";
         boolean isMatch = StringTool.match(currentString, pattern);
-        assertEquals(false, isMatch);
+        assertFalse(isMatch);
     }
 
     @Test
     public void Given_StringWithGoodNumberOccurences_When_MatchSpecificRuleWithMinMax_Then_ReturnTrue(){
         String currentString = "04351";
-        boolean isMatch = StringTool.matchSpecificRule(currentString,"minMaxOfDigit",6,0,2);
-        assertEquals(true, isMatch);
+        boolean isMatch = StringTool.matchSpecificDigitRule(currentString,"digitMaxRepeat",new Integer[] {6,0,2});
+        assertTrue(isMatch);
     }
 
     @Test
     public void Given_StringWithMoreThanMaxNumberOccurence_When_MatchSpecificRuleWithMinMax_Then_ReturnFalse(){
         String currentString = "0434421";
-        boolean isMatch = StringTool.matchSpecificRule(currentString,"minMaxOfDigit",8,0,2);
-        assertEquals(false, isMatch);
+        boolean isMatch = StringTool.matchSpecificDigitRule(currentString,"digitMaxRepeat",new Integer[] {8,0,2});
+        assertFalse(isMatch);
     }
 
     @Test
     public void Given_StringWithLessThanMinNumberOccurences_When_MatchSpecificRuleWithMinMax_Then_ReturnFalse(){
         String currentString = "04351430297";
-        boolean isMatch = StringTool.matchSpecificRule(currentString,"minMaxOfDigit",10,1,2);
-        assertEquals(false, isMatch);
+        boolean isMatch = StringTool.matchSpecificDigitRule(currentString,"digitMaxRepeat",new Integer[] {10,1,2});
+        assertFalse(isMatch);
     }
 
 }
