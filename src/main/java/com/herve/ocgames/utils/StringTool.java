@@ -50,15 +50,19 @@ public class StringTool {
         switch (ruleName){
             case "digitMaxRepeat":
                 // Rules to control times we repeat a digit in String only composed with digits from 0 to nbDigit - 1
+                // numeric parameters
                 int nbDigits = numericParameters[0];
                 int minRepeat = numericParameters[1];
                 int maxRepeat = numericParameters[2];
+                // and other variables
                 int[] digitCounter = {0,0,0,0,0,0,0,0,0,0};
                 int inputDigit ;
+                // create counter with integer array
                 for (int i = 0 ; i < inputString.length() ; i++){
                     inputDigit = Integer.valueOf(String.valueOf(inputString.charAt(i)));
                     digitCounter[inputDigit] ++ ;
                 }
+                // compare each counter in array to check if it repects rule
                 for (int i = 0 ; i < nbDigits; i++){
                     if (digitCounter[i] < minRepeat || digitCounter[i] > maxRepeat) isMatching = false;
                 }
