@@ -1,9 +1,9 @@
 package com.herve.ocgames.utils;
 
-import com.herve.ocgames.utils.exceptions.InvalidDigitParametersForMatchingMethod;
-import com.herve.ocgames.utils.exceptions.InvalidInputStringForMatchingMethod;
-import com.herve.ocgames.utils.exceptions.InvalidPatternForMatchingMethod;
-import com.herve.ocgames.utils.exceptions.InvalidRuleNameForMatchingMethod;
+import com.herve.ocgames.core.exceptions.InvalidDigitParametersForMatchingMethod;
+import com.herve.ocgames.core.exceptions.InvalidInputStringForMatchingMethod;
+import com.herve.ocgames.core.exceptions.InvalidPatternForMatchingMethod;
+import com.herve.ocgames.core.exceptions.InvalidRuleNameForMatchingMethod;
 import org.apache.log4j.Logger;
 
 import java.util.regex.Matcher;

@@ -1,18 +1,15 @@
 package com.herve.ocgames.utils;
 
-import com.herve.ocgames.utils.exceptions.InvalidDigitParametersForMatchingMethod;
-import com.herve.ocgames.utils.exceptions.InvalidInputStringForMatchingMethod;
-import com.herve.ocgames.utils.exceptions.InvalidPatternForMatchingMethod;
-import com.herve.ocgames.utils.exceptions.InvalidRuleNameForMatchingMethod;
+import com.herve.ocgames.core.exceptions.InvalidDigitParametersForMatchingMethod;
+import com.herve.ocgames.core.exceptions.InvalidInputStringForMatchingMethod;
+import com.herve.ocgames.core.exceptions.InvalidPatternForMatchingMethod;
+import com.herve.ocgames.core.exceptions.InvalidRuleNameForMatchingMethod;
 import org.apache.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
 

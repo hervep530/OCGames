@@ -13,7 +13,7 @@ public class Response {
     private Map<String, Object> values;
 
     /**
-     *
+     * Constructor
      * Use Diamond Type introduce with java 1.7
      */
     public Response() {
@@ -25,6 +25,10 @@ public class Response {
         // this.values = null;
         this.values = new HashMap<>();
     }
+
+    /*
+        Getters and Setters
+     */
 
     public int getErrCode() {
         return errCode;

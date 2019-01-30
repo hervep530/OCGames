@@ -79,12 +79,43 @@ public class Text {
 
     public static final String CLEAR_SCREEN = "\033[2J";
 
+    /**
+     * Given a text and an avaible color as static Class variable, return a string like COLOR + text + RESET
+     * @param text String with text to colorize
+     * @param color color prefix as string (for example : bright_red to use the BRIGHT_RED_COLOR value)
+     * @return a String with text prefixed by color code and suffixed by reset code
+     */
     public static String effect(String text, String color){
-        return "";
+        String result = text;
+        String effect;
+        if (color == null) return text;
+        try {
+            effect = Text.class.getDeclaredField(color.toUpperCase() + "_COLOR").get(null).toString();
+            result = effect + text + RESET;
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            return text;
+        }
+        return result;
     }
 
+    /**
+     * Given a text and an avaible color as static Class variable, return a string like COLOR + text + RESET
+     * @param text String with text to colorize
+     * @param type String which indicate the name of effect (ex : background, underlined,...)
+     * @return a String with text prefixed by color / effect code and suffixed by reset code
+     */
     public static String effect(String text, String type, String color){
-        return "";
+        String result = text;
+        String effect;
+        if (color == null) return text;
+        try {
+            String effectReference = color.toUpperCase() + "_" + type.toUpperCase();
+            effect = Text.class.getDeclaredField(effectReference).get(null).toString();
+            result = effect + text + RESET;
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            return text;
+        }
+        return result;
     }
 
 }
