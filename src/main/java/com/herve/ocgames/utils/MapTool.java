@@ -1,6 +1,8 @@
 package com.herve.ocgames.utils;
 
 import com.herve.ocgames.core.exceptions.InvalidAliasKey;
+import com.herve.ocgames.core.exceptions.InvalidArrayOption;
+import com.herve.ocgames.core.exceptions.InvalidMapConverter;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
@@ -10,8 +12,22 @@ public class MapTool {
 
     private static Logger supportLogger = Logger.getLogger("support_file");
     private static Logger devLogger = Logger.getLogger("development_file");
+    private static Logger consoleLogger = Logger.getRootLogger();
 
-    public static String[][] convertStringMapToStringArray(Map<String,String> inputMap) {
+    /**
+     * Convert a map<String, String> to bidimensionnal array String[][] (usefull to avoid usage of lambda)
+     * @param inputMap a input map<string,string> to convert
+     * @return array String[nbKey][2] as {{key,value},{key,value},....}
+     */
+    public static String[][] convertStringMapToStringArray(Map<String,String> inputMap, boolean verbose) {
+        if (inputMap == null) {
+            if (verbose) devLogger.fatal("You can't use this method with null mapConverter");
+            throw new InvalidMapConverter();
+        }
+        if (inputMap.isEmpty()) {
+            if (verbose) devLogger.fatal("You can't use this method with empty mapConverter");
+            throw new InvalidMapConverter();
+        }
         int nbEntry = inputMap.size();
         String[][] outputArray = new String[nbEntry][2];
         int i = 0;
@@ -24,20 +40,40 @@ public class MapTool {
     }
 
     /**
-     *
+     * Convert a flat array String[] (like args[]) to a String map, with using a converter map<String alias, String key>
      * Use Diamond Type introduce with java 1.7
-     * @param alias
-     * @param arguments
-     * @return
+     * @param mapConverter map<String alias, String key> working as conversion rules
+     * @param flatArray array containing suites of strings as : {alias1, value1, alias2, alias3, value 3,....}
+     * @return a result map as {<key1, value1>,<key2, value2>,<key3, value3>,....}
      */
-    public static Map<String,String> convertFlatStringArrayToMap(Map<String,String> alias, String[] arguments) {
+    public static Map<String,String> convertFlatStringArrayToMap(Map<String,String> mapConverter, String[] flatArray, boolean verbose) {
         Map<String, String> mapOptions = new HashMap<>();
         String index = "";
         String value = "";
         String key = "";
 
-        for (int i = 0; i < arguments.length; i++) {
-            if (arguments[i].startsWith("-")) {
+        if (mapConverter == null) {
+            devLogger.fatal("You can't use this method with null mapConverter");
+            throw new InvalidMapConverter();
+        }
+        if (mapConverter.isEmpty()) {
+            devLogger.fatal("You can't use this method with empty mapConverter");
+            throw new InvalidMapConverter();
+        }
+        if (flatArray == null) {
+            devLogger.error("Usage of this method with null flat array is not recommended");
+            return  mapOptions;
+        }
+        if (flatArray.length < 1) {
+            devLogger.debug("In method convertFlatStringArrayToMap, array option is empty.");
+            return  mapOptions;
+        }
+        for (int i = 0; i < flatArray.length; i++) {
+            if (flatArray[i] == null) {
+                if (verbose) consoleLogger.fatal("Invalid array option");
+                throw new InvalidArrayOption();
+            }
+            if (flatArray[i].startsWith("-")) {
                 // si c'est une options (c'est à dire -qqchose ou --qqchose)
                 if (! index.contentEquals("")) {
                     // si l'index n'a pas été utilisé (il est non ""), on le traite comme un binaire ("0", ou "1")
@@ -46,18 +82,24 @@ public class MapTool {
                         value = "0";
                         index = index.replaceAll("no", "");
                     }
-                    if (alias.containsKey(index)) {
-                        mapOptions.put(alias.get(index), value);
-                    } else throw new InvalidAliasKey();
+                    if (mapConverter.containsKey(index)) {
+                        mapOptions.put(mapConverter.get(index), value);
+                    } else {
+                        if (verbose) consoleLogger.fatal("Invalid option : " + index);
+                        throw new InvalidAliasKey();
+                    }
                 }
                 // Dans tous les cas on stocke l'option dans index
-                index = arguments[i].replaceAll("^-+", "");
+                index = flatArray[i].replaceAll("^-+", "");
             } else {
                 // sinon il s'agit d'une valeur que l'on va associer à l'options stockée dans index
-                if (! index.contentEquals("") && alias.containsKey(index)) {
-                    mapOptions.put(alias.get(index), arguments[i]);
+                if (! index.contentEquals("") && mapConverter.containsKey(index)) {
+                    mapOptions.put(mapConverter.get(index), flatArray[i]);
                     index = "";
-                } else throw new InvalidAliasKey();
+                } else {
+                    if (verbose) consoleLogger.fatal("Invalid option : " + index);
+                    throw new InvalidAliasKey();
+                }
             }
         }
         if (! index.contentEquals("")) {
@@ -67,9 +109,12 @@ public class MapTool {
                 value = "0";
                 index = index.replaceAll("no", "");
             }
-            if (alias.containsKey(index)) {
-                mapOptions.put(alias.get(index), value);
-            } else throw new InvalidAliasKey();
+            if (mapConverter.containsKey(index)) {
+                mapOptions.put(mapConverter.get(index), value);
+            } else  {
+                if (verbose) consoleLogger.fatal("Invalid option : " + index);
+                throw new InvalidAliasKey();
+            }
         }
         return mapOptions;
     }
