@@ -7,10 +7,10 @@ import com.herve.ocgames.plusmoins.PlayerPlusMoins;
 public class PlayerFactory {
 
     /**
-     * Permet d'instancier l'objet player en fonction du jeu choisi
-     * Généralisation dans la classe Player, spécialisation à partir des classes JeuPlayer
-     * @param gameId   Id du jeu
-     * @return PlayerMasterMind or PlayerPlusMoins
+     * Instanciate object player regarding choice between game MasterMind (id 1 in GameFromList) and PlusMoins (id 2)
+     * Player implements global features PlayerMasterMind and PlayerPlusMoins implement specific properties / methods
+     * @param gameId   Game id
+     * @return Object PlayerMasterMind or PlayerPlusMoins
      */
     public static Player getPlayer(int gameId){
         switch (gameId){
