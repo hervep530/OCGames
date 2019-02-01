@@ -1,5 +1,12 @@
 package com.herve.ocgames.core.enums;
 
+/*
+ * This enum is used to filter content of config.properties
+ * enum first member is the key
+ * enum second member is a regexp which give the rule to filter value
+ * All key value not compliant with enum will be rejected
+ */
+
 public enum ConfigEntry {
 
     CONFIGMODE("config.mode","^(strict|custom)$"),
