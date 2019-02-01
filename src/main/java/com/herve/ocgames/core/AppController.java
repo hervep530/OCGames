@@ -5,13 +5,14 @@ package com.herve.ocgames.core;
  */
 
 import com.herve.ocgames.core.enums.GameFromList;
+import com.herve.ocgames.core.interfaces.AppControllerInterface;
 import com.herve.ocgames.utils.StringTool;
 import com.herve.ocgames.utils.Text;
 import com.herve.ocgames.utils.UserInteraction;
 
 import static com.herve.ocgames.Main.devLogger;
 
-public class AppController {
+public class AppController implements AppControllerInterface {
 
     private boolean applicationStopped ;
     private boolean debug = false;
