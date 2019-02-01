@@ -1,4 +1,6 @@
 package com.herve.ocgames.mastermind;
 
-public class PlayerMasterMind {
+import com.herve.ocgames.core.Player;
+
+public class PlayerMasterMind extends Player {
 }

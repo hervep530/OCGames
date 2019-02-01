@@ -1,4 +1,6 @@
 package com.herve.ocgames.plusmoins;
 
-public class PlayerPlusMoins {
+import com.herve.ocgames.core.Player;
+
+public class PlayerPlusMoins extends Player {
 }
