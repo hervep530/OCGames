@@ -16,6 +16,9 @@ public abstract class CodeGenerator implements CodeGeneratorInterface {
     protected int debugVerbosity;
     protected String[][] argumentSubstitutes;
 
+    /*
+     * Constructor
+     */
 
     public CodeGenerator() {
         codeLength = Integer.parseInt(PropertyHelper.config("game.codeLength"));
@@ -30,6 +33,10 @@ public abstract class CodeGenerator implements CodeGeneratorInterface {
         GameCache.setComputerCode(code);
     }
 
+    /*
+     * Shortcut, utilities to access PropertyHelper language keys
+     */
+
     protected String lang(String key){
         return PropertyHelper.language(key);
     }
@@ -38,33 +45,11 @@ public abstract class CodeGenerator implements CodeGeneratorInterface {
         return PropertyHelper.language(key, arraySubstitutions);
     }
 
-    protected void invalidArgument(String method, String argument){
-        this.argumentSubstitutes = new String[][] {{"VAR_METHOD", method}, {"VAR_ARGUMENT", argument}};
-        consoleLogger.fatal(lang("error.invalidArgument", this.argumentSubstitutes));
-        supportLogger.fatal(lang("support.invalidArgument", this.argumentSubstitutes));
-        GameCache.failure();
-    }
-
-    protected void debugV1(String message){
-        // debug when verbosity level is equal to 1 - Should be used to exceptionnaly log debug message in the console
-        if (this.debug && this.debugVerbosity > 0) devConsoleLogger.debug(message);
-    }
-
-    protected void debugV2(String message){
-        // debug when verbosity level is up to 2 - Should be used to log computed value in file
-        if (this.debug && this.debugVerbosity > 1) devLogger.debug(message);
-    }
-
-    protected void debugV3(String message){
-        // debug when verbosity level is up to 3 - Should be used to log message as comment in the code
-        if (this.debug && this.debugVerbosity > 2) devLogger.debug(message);
-    }
-
-    protected void debugV4(String message){
-        // debug when verbosity level is up to 4 - Should be exceptionnaly used to log computed value in loop
-        if (this.debug && this.debugVerbosity > 3) devLogger.debug(message);
-    }
-
+    /**
+     * Utility to display a king of history in dual mode (not really easy to use...)
+     * @param nbAttempts nb of turn display in history
+     * @return a string which give history on one line
+     */
     protected String displayResultFromPreviousAttempts(int nbAttempts) {
         String message = "";
         String previousAttempts= "";
@@ -82,6 +67,10 @@ public abstract class CodeGenerator implements CodeGeneratorInterface {
         message = lang("game.displayPreviousAttempts", previousReplace);
         return message;
     }
+
+    /*
+     * Partie Metier
+     */
 
     @Override
     public Response generateRandom() {
@@ -140,5 +129,35 @@ public abstract class CodeGenerator implements CodeGeneratorInterface {
         response.setMessage(lang("game.codeAttemptGiven"));
         return response;
     }
+
+    /*
+     * Utilities to access log in different verbosity level
+     */
+
+    protected void invalidArgument(String method, String argument){
+        this.argumentSubstitutes = new String[][] {{"VAR_METHOD", method}, {"VAR_ARGUMENT", argument}};
+        consoleLogger.fatal(lang("error.invalidArgument", this.argumentSubstitutes));
+        supportLogger.fatal(lang("support.invalidArgument", this.argumentSubstitutes));
+        GameCache.failure();
+    }
+
+    protected void debugV1(String message){
+        // debug when verbosity level is equal to 1 - Should be used to exceptionnaly log debug message in the console
+        if (this.debug && this.debugVerbosity > 0) devConsoleLogger.debug(message);
+    }
+
+    protected void debugV2(String message){
+        // debug when verbosity level is up to 2 - Should be used to log computed value in file
+        if (this.debug && this.debugVerbosity > 1) devLogger.debug(message);
+    }
+
+    protected void debugV3(String message){
+        // debug when verbosity level is up to 3 - Should be used to log message as comment in the code
+        if (this.debug && this.debugVerbosity > 2) devLogger.debug(message);
+    }
+
+    // debug when verbosity level is up to 4 - Should be exceptionnaly used to log computed value in loop
+    //protected void debugV4(String message){ if (this.debug && this.debugVerbosity > 3) devLogger.debug(message); }
+
 
 }
