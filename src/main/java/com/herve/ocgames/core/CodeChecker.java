@@ -93,7 +93,9 @@ public abstract class CodeChecker implements CodeCheckerInterface {
         if (this.debug && this.debugVerbosity > 2) devLogger.debug(message);
     }
 
-    // debug when verbosity level is up to 4 - Should be exceptionnaly used to log computed value in loop
-    // protected void debugV4(String message){ if (this.debug && this.debugVerbosity > 3) devLogger.debug(message); }
+    protected void debugV4(String message){
+        // debug when verbosity level is up to 4 - Should be exceptionnaly used to log computed value in loop
+        if (this.debug && this.debugVerbosity > 3) devLogger.debug(message);
+    }
 
 }
