@@ -112,8 +112,7 @@ public class CodeCheckerMasterMind extends CodeChecker {
         Integer[] digitParameters = new Integer[]{this.digitsInGame,0,this.digitMaxRepeat};
 
         debugV3("error management if arguments are wrong"); // comment used for debug
-        if (! StringTool.match(submittedEvaluation, "^[ox]{0," + this.codeLength + "}$" ) ||
-                ! StringTool.matchSpecificDigitRule(submittedEvaluation, "digitMaxRepeat", digitParameters))
+        if (! StringTool.match(submittedEvaluation, "^[ox]{0," + this.codeLength + "}$" ))
             invalidArgument("askRefereeControl","submittedEvaluation");
         if (! StringTool.match(refereeEvaluation, "^[ox]{0," + this.codeLength + "}$" ))
             invalidArgument("askRefereeControl","refereeEvaluation");

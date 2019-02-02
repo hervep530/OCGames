@@ -48,7 +48,6 @@ public class StringTool {
             devLogger.fatal("You can't use match method with null inputString");
             throw new InvalidInputStringForMatchingMethod();
         }
-        if (inputString.contentEquals("")) return false;
         Pattern p = Pattern.compile(referencePattern);
         Matcher m = p.matcher(inputString);
         return m.matches();
