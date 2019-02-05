@@ -107,7 +107,7 @@ public class PropertyHelper {
 
     public static String language(String key, String[][] substitutions){
         if ( ! languageRepository.containsKey(key) ){
-            supportLogger.error("PropertyHelper can't find language entry (message) with key " + key);
+            supportLogger.warn("PropertyHelper can't find language entry (message) with key " + key);
             return "";
         }
         String message = languageRepository.get(key);
@@ -273,11 +273,13 @@ public class PropertyHelper {
             return;
         }
         Map<String,String> validCmdLineAlias = new HashMap<>();
-        validCmdLineAlias.put("debug", "debug");
-        validCmdLineAlias.put("d", "debug");
-        // Using ALMTool method, Create Map from arguments crossed with Map of alias, then overload properties in foreach
-        MapTool.convertFlatStringArrayToMap(validCmdLineAlias, arguments, false)
-                .forEach((k,v)->configRepository.put(k, v));
+        validCmdLineAlias.put("debug", "core.debug");
+        validCmdLineAlias.put("d", "core.debug");
+        // Using MapTool method, Create Map from arguments crossed with Map of alias, then overload properties in foreach
+        MapTool.convertFlatStringArrayToMap(validCmdLineAlias, arguments, false).entrySet().stream()
+                .filter(Entry-> StringTool.match(Entry.getValue(),
+                        ConfigEntry.valueOf(Entry.getKey().replaceAll("\\.","").toUpperCase()).valueFilter()))
+                .forEach(Entry->configRepository.put(Entry.getKey(), Entry.getValue()));
     }
 
     /**
