@@ -17,7 +17,7 @@ public class Main {
 
     public static void main(String[] args) {
         // Initialize property helper (default config -> config file -> command options)
-        PropertyHelper.initialize();
+        PropertyHelper.initialize(args);
         /* If debug is activated, set logger loglevel to debug        */
         if (StringTool.match(PropertyHelper.config("core.debug"),"([tT]rue|1|[yY]es)"))
             Configurator.setLevel(devConsoleLogger.getName(), Level.DEBUG);

@@ -8,9 +8,12 @@ import com.herve.ocgames.core.interfaces.GameInterface;
 import com.herve.ocgames.utils.StringTool;
 import com.herve.ocgames.utils.Text;
 import com.herve.ocgames.utils.UserInteraction;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import static com.herve.ocgames.Main.consoleLogger;
-import static com.herve.ocgames.Main.devLogger;
 
 public class Game implements GameInterface {
 
@@ -20,9 +23,14 @@ public class Game implements GameInterface {
     private boolean defender;
     private boolean challenger;
     private Player player;
-    private boolean debug = false;
-    private int debugVerbosity = 2 ;
     private String [][] langSubstitutes;
+
+    private boolean debug = false;
+    private static Level VALUE = Level.getLevel("VALUE");
+    private static Level COMMENT = Level.getLevel("COMMENT");
+    private static Level LOOP = Level.getLevel("LOOP");
+    private static Level debugVerbosity = Level.getLevel("VALUE");
+    private static final Logger dev = LogManager.getLogger(Game.class.getName());
 
     /**
      *     Constructor
@@ -30,7 +38,8 @@ public class Game implements GameInterface {
     public Game(){
         int gameMode;
         try {
-            this.debug = StringTool.match(PropertyHelper.config("core.debug"), "^([Tt]rue|[Yy]es|1)$");
+            initLogger();
+            // Get game properties
             gameFromList = GameFromList.valueOf("JEU" + GameChoice.getGameId());
             String versionValue = (PropertyHelper.config(gameFromList.getName() + ".version")).toUpperCase();
             version = GameVersion.valueOf(versionValue);
@@ -53,14 +62,15 @@ public class Game implements GameInterface {
                     break;
             }
             ConfigMode configMode = ConfigMode.valueOf(PropertyHelper.config("config.mode").toUpperCase());
-            //debugV2(System.out.println(configMode.toString()));
             PropertyHelper.loadGame("JEU" + GameChoice.getGameId(), configMode);
+            // Initialize Player
             player = PlayerFactory.getPlayer(GameChoice.getGameId());
         } catch (NullPointerException e) {
             // we stop all before GameCache.initialize, so GameCache.isFailed() ==  true, and game is stopped
             consoleLogger.fatal(lang("error.game.instanciate"));
             return;
         }
+        // Initialize GameCache and set langSubstitutes for dynamic messages from languageRepository
         GameCache.initialize(gameMode);
         this.langSubstitutes = new String[][] {{"VAR_NAME", GameCache.getGameName()},
                 {"VAR_MODE", this.mode},
@@ -80,6 +90,15 @@ public class Game implements GameInterface {
         // Constructor to force computerSecretCode without random - !!!! only for test !!!!
         super();
         GameCache.setComputerCode(computerSecretCode);
+    }
+
+    /**
+     * Get PropertyHelper core.debug value and if true, set debug level (VALUE / COMMENT / LOOP)
+     */
+    private void initLogger(){
+        this.debug = StringTool.match(PropertyHelper.config("core.debug"), "^([Tt]rue|[Yy]es|1)$");
+        // Here can be change debug verbosity (... < INFO < DEBUG < VALUE < COMMENT < LOOP < TRACE) - no debug = WARN
+        if (this.debug) Configurator.setLevel(dev.getName(), debugVerbosity);
     }
 
     /**
@@ -107,7 +126,7 @@ public class Game implements GameInterface {
      */
     public void start(){
         if ( GameCache.isFailed() ) return;
-        debugV3("Execute all lines except challenger lines if we play as defender, except challengers if we play as defender");
+        dev.log(COMMENT,"We execute same code for all modes, but instructions are filtered with if");
         this.welcome();
         if (this.challenger) player.letComputerGenerateSecretCode();
         if (this.debug) UserInteraction.displayMessage("%n");
@@ -152,20 +171,5 @@ public class Game implements GameInterface {
         }
         UserInteraction.displayMessage(endMessage);
     }
-
-    // debug when verbosity level is equal to 1 - Should be used to exceptionnaly log debug message in the console
-    //private void debugV1(String message){ if (this.debug && this.debugVerbosity > 0) devConsoleLogger.debug(message); }
-
-    // debug when verbosity level is up to 2 - Should be used to log computed value in file
-    // private void debugV2(String message){ if (this.debug && this.debugVerbosity > 1) devLogger.debug(message); }
-
-    // ***** provide a way to debug and comment code *****
-    private void debugV3(String message){
-        // debug when verbosity level is up to 3 - Should be used to log message as comment in the code
-        if (this.debug && this.debugVerbosity > 2) devLogger.debug(message);
-    }
-
-    // debug when verbosity level is up to 4 - Should be exceptionnaly used to log computed value in loop
-    // private void debugV4(String message){ if (this.debug && this.debugVerbosity > 3) devLogger.debug(message); }
 
 }

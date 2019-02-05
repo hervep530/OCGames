@@ -7,6 +7,10 @@ import com.herve.ocgames.core.enums.GameVersion;
 import com.herve.ocgames.utils.FileTool;
 import com.herve.ocgames.utils.MapTool;
 import com.herve.ocgames.utils.StringTool;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,32 +23,45 @@ import static com.herve.ocgames.Main.*;
 public class PropertyHelper {
     private static HashMap<String,String> configRepository = new HashMap<String,String>();
     private static HashMap<String,String> languageRepository = new HashMap<String,String>();
+
     private static boolean debug = false;
-    private static int debugVerbosity = 2 ;
-
-
+    private static Level VALUE = Level.getLevel("VALUE");
+    private static Level COMMENT = Level.getLevel("COMMENT");
+    private static Level LOOP = Level.getLevel("LOOP");
+    private static Level debugVerbosity = Level.getLevel("VALUE");
+    private static final Logger dev = LogManager.getLogger(PropertyHelper.class.getName());
 
     /**
      * For this static classe replace a constructor
      */
-    public static void initialize(){
+    public static void initialize(String[] cmdLineOptions){
         defaultConfig();
         loadConfigFiles();
-        importCommandLineOptions(new String[] {"",""});
+        importCommandLineOptions(cmdLineOptions);
+        initLogger();
         loadLanguageFiles();
     }
 
     /**
-     * For this static classe replace a constructor
+     * For this static classe replace a constructor - Get default from an external HashMap instead of code below
      */
-    public static void initialize(HashMap<String,String> defaultProperties) {
+    public static void initialize(HashMap<String,String> defaultProperties, String[] cmdLineOptions) {
         defaultConfig();                                        // hard parameters in the code
         defaultConfig(defaultProperties);                       // additionnal parameters given in argument as Map
         loadConfigFiles();                                      // parameters from resource file in core package
-        importCommandLineOptions(new String[] {"",""});         // parameters from command line
+        importCommandLineOptions(cmdLineOptions);         // parameters from command line
+        initLogger();
         loadLanguageFiles();                                    // languages from resource file in core package
     }
 
+    /**
+     * Get PropertyHelper core.debug value and if true, set debug level (VALUE / COMMENT / LOOP)
+     */
+    private static void initLogger(){
+        debug = StringTool.match(PropertyHelper.config("core.debug"), "^([Tt]rue|[Yy]es|1)$");
+        // Here can be change debug verbosity (... < INFO < DEBUG < VALUE < COMMENT < LOOP < TRACE) - no debug = WARN
+        if (debug) Configurator.setLevel(dev.getName(), debugVerbosity);
+    }
 
     /**
      * Kind of getter for configReposity - get all the map configRepository
@@ -165,7 +182,7 @@ public class PropertyHelper {
      */
     public static void loadGame(String gameName, ConfigMode configMode){
         if (configMode == ConfigMode.STRICT) {
-            debugV3("Configuration will be apply as defined in enum GameVersion - if failed keep default config");
+            dev.log(COMMENT,"Configuration will be apply as defined in enum GameVersion - if failed keep default config");
             try {
                 GameFromList game = GameFromList.valueOf(gameName.toUpperCase());
                 String version = configRepository.get(game.getName() + ".version");
@@ -182,7 +199,7 @@ public class PropertyHelper {
                 return;
             }
         } else {
-            debugV3("Can use all parameters defined in ConfigEntry - if failed keep default config");
+            dev.log(COMMENT,"Can use all parameters defined in ConfigEntry - if failed keep default config");
             try {
                 GameFromList game = GameFromList.valueOf(gameName.toUpperCase());
                 configRepository.put("game.name", game.getName());
@@ -190,11 +207,11 @@ public class PropertyHelper {
                 configRepository.put("game.digitsInGame", configRepository.get(game.getName() + ".digitsInGame"));
                 if (configRepository.containsKey(game.getName() + ".digitMaxRepeat")) {
                     configRepository.put("game.digitMaxRepeat", configRepository.get(game.getName() + ".digitMaxRepeat"));
-                    debugV2("digitMaxRepeat (found) = " + configRepository.get("game.digitMaxRepeat"));
+                    dev.log(VALUE,"digitMaxRepeat (found) = " + configRepository.get("game.digitMaxRepeat"));
                 } else {
-                    debugV3("Key digitMaxRepeat not found in configRepository - will be same as codeLength");
+                    dev.log(COMMENT,"Key digitMaxRepeat not found in configRepository - will be same as codeLength");
                     configRepository.put("game.digitMaxRepeat", configRepository.get(game.getName() + ".codeLength"));
-                    debugV2("digitMaxRepeat (not found) = " + configRepository.get("game.digitMaxRepeat"));
+                    dev.log(VALUE,"digitMaxRepeat (not found) = " + configRepository.get("game.digitMaxRepeat"));
                 }
                 configRepository.put("game.attempts", configRepository.get(game.getName() + ".attempts"));
             } catch (NullPointerException e) {
@@ -208,7 +225,7 @@ public class PropertyHelper {
         // Import file resources/config.properties following rules defined by enum ConfigEntry
         String fileName = "resources/config.properties";
         try {
-            debugV3("Use FileTool to import file and ConfigEntry enums to filter keys and values");
+            dev.log(COMMENT,"Use FileTool to import file and ConfigEntry enums to filter keys and values");
             FileTool.getArrayListFromFile(fileName).stream()
                     .filter(property->StringTool.match(property[1],
                             ConfigEntry.valueOf(property[0].replaceAll("\\.","").toUpperCase()).valueFilter()))
@@ -230,7 +247,7 @@ public class PropertyHelper {
         // Import file resources/language/language-CONFIG.properties (CONFIG is restricted with ConfigEntry)
         String fileName = "resources/language/language-" + configRepository.get("core.language") + ".properties";
         try {
-            debugV3("Use FileTool to import file and ConfigEntry with a permissive filter");
+            dev.log(COMMENT,"Use FileTool to import file and ConfigEntry with a permissive filter");
             String filterKey = ".*";
             FileTool.getArrayListFromFile(fileName).stream()
                     .filter(property->StringTool.match(property[0],filterKey))
@@ -332,26 +349,6 @@ public class PropertyHelper {
         String message = languageRepository.get(keyMessage);
         message = StringTool.arrayReplace(message, substitutions);
         System.out.println(String.format(message));
-    }
-
-    private static void debugV1(String message){
-        // debug when verbosity level is equal to 1 - Should be used to exceptionnaly log debug message in the console
-        if (debug && debugVerbosity > 0) devConsoleLogger.debug(message);
-    }
-
-    private static void debugV2(String message){
-        // debug when verbosity level is up to 2 - Should be used to log computed value in file
-        if (debug && debugVerbosity > 1) devLogger.debug(message);
-    }
-
-    private static void debugV3(String message){
-        // debug when verbosity level is up to 3 - Should be used to log message as comment in the code
-        if (debug && debugVerbosity > 2) devLogger.debug(message);
-    }
-
-    private static void debugV4(String message){
-        // debug when verbosity level is up to 4 - Should be exceptionnaly used to log computed value in loop
-        if (debug && debugVerbosity > 3) devLogger.debug(message);
     }
 
 }
