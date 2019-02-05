@@ -4,22 +4,23 @@ import com.herve.ocgames.core.AppController;
 import com.herve.ocgames.core.GameChoice;
 import com.herve.ocgames.core.PropertyHelper;
 import com.herve.ocgames.utils.StringTool;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 
 public class Main {
 
-    final public static Logger consoleLogger = Logger.getLogger("root");
-    final public static Logger supportLogger = Logger.getLogger("support_file");
-    final public static Logger devLogger = Logger.getLogger("development_file");
-    final public static Logger devConsoleLogger = Logger.getLogger("development_console");
+    final public static Logger consoleLogger = LogManager.getLogger("root");
+    final public static Logger supportLogger = LogManager.getLogger("support_file");
+    final public static Logger devConsoleLogger = LogManager.getLogger("development_console");
 
     public static void main(String[] args) {
         // Initialize property helper (default config -> config file -> command options)
         PropertyHelper.initialize();
         /* If debug is activated, set logger loglevel to debug        */
         if (StringTool.match(PropertyHelper.config("core.debug"),"([tT]rue|1|[yY]es)"))
-            devLogger.setLevel(Level.DEBUG);
+            Configurator.setLevel(devConsoleLogger.getName(), Level.DEBUG);
 
         // Initialize AppController (control how the application globally runs)
         AppController appController = new AppController();
