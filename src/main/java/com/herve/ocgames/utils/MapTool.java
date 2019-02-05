@@ -3,16 +3,32 @@ package com.herve.ocgames.utils;
 import com.herve.ocgames.core.exceptions.InvalidAliasKey;
 import com.herve.ocgames.core.exceptions.InvalidArrayOption;
 import com.herve.ocgames.core.exceptions.InvalidMapConverter;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class MapTool {
 
-    private static Logger supportLogger = Logger.getLogger("support_file");
-    private static Logger devLogger = Logger.getLogger("development_file");
-    private static Logger consoleLogger = Logger.getRootLogger();
+    private static final Logger supportLogger = LogManager.getLogger("support_file");
+    private static final Logger devConsoleLogger = LogManager.getLogger("development_console");
+    private static final Logger dev = LogManager.getLogger("development_file");
+    private static boolean loggerInitialized = false;
+    private static final Level VALUE = Level.getLevel("VALUE");
+    private static final Level COMMENT = Level.getLevel("COMMENT");
+    private static final Level LOOP = Level.getLevel("LOOP");
+    private static Level debugVerbosity = Level.getLevel("WARN");
+
+    /**
+     * Get PropertyHelper core.debug value and if true, set debug level (VALUE / COMMENT / LOOP)
+     */
+    private static void initLogger(){
+        Configurator.setLevel(dev.getName(), debugVerbosity);
+        loggerInitialized = true;
+    }
 
     /**
      * Convert a map<String, String> to bidimensionnal array String[][] (usefull to avoid usage of lambda)
@@ -20,12 +36,14 @@ public class MapTool {
      * @return array String[nbKey][2] as {{key,value},{key,value},....}
      */
     public static String[][] convertStringMapToStringArray(Map<String,String> inputMap, boolean verbose) {
+        if ( ! loggerInitialized ) initLogger();
+
         if (inputMap == null) {
-            if (verbose) devLogger.fatal("You can't use this method with null mapConverter");
+            if (verbose) dev.fatal("You can't use this method with null mapConverter");
             throw new InvalidMapConverter();
         }
         if (inputMap.isEmpty()) {
-            if (verbose) devLogger.fatal("You can't use this method with empty mapConverter");
+            if (verbose) dev.fatal("You can't use this method with empty mapConverter");
             throw new InvalidMapConverter();
         }
         int nbEntry = inputMap.size();
@@ -47,30 +65,32 @@ public class MapTool {
      * @return a result map as {<key1, value1>,<key2, value2>,<key3, value3>,....}
      */
     public static Map<String,String> convertFlatStringArrayToMap(Map<String,String> mapConverter, String[] flatArray, boolean verbose) {
+        if ( ! loggerInitialized ) initLogger();
+
         Map<String, String> mapOptions = new HashMap<>();
         String index = "";
         String value = "";
         String key = "";
 
         if (mapConverter == null) {
-            devLogger.fatal("You can't use this method with null mapConverter");
+            dev.fatal("You can't use this method with null mapConverter");
             throw new InvalidMapConverter();
         }
         if (mapConverter.isEmpty()) {
-            devLogger.fatal("You can't use this method with empty mapConverter");
+            dev.fatal("You can't use this method with empty mapConverter");
             throw new InvalidMapConverter();
         }
         if (flatArray == null) {
-            devLogger.error("Usage of this method with null flat array is not recommended");
+            dev.error("Usage of this method with null flat array is not recommended");
             return  mapOptions;
         }
         if (flatArray.length < 1) {
-            devLogger.debug("In method convertFlatStringArrayToMap, array option is empty.");
+            dev.debug("In method convertFlatStringArrayToMap, array option is empty.");
             return  mapOptions;
         }
         for (int i = 0; i < flatArray.length; i++) {
             if (flatArray[i] == null) {
-                if (verbose) consoleLogger.fatal("Invalid array option");
+                if (verbose) devConsoleLogger.fatal("Invalid array option");
                 throw new InvalidArrayOption();
             }
             if (flatArray[i].startsWith("-")) {
@@ -85,7 +105,7 @@ public class MapTool {
                     if (mapConverter.containsKey(index)) {
                         mapOptions.put(mapConverter.get(index), value);
                     } else {
-                        if (verbose) consoleLogger.fatal("Invalid option : " + index);
+                        if (verbose) devConsoleLogger.fatal("Invalid option : " + index);
                         throw new InvalidAliasKey();
                     }
                 }
@@ -97,7 +117,7 @@ public class MapTool {
                     mapOptions.put(mapConverter.get(index), flatArray[i]);
                     index = "";
                 } else {
-                    if (verbose) consoleLogger.fatal("Invalid option : " + index);
+                    if (verbose) devConsoleLogger.fatal("Invalid option : " + index);
                     throw new InvalidAliasKey();
                 }
             }
@@ -112,7 +132,7 @@ public class MapTool {
             if (mapConverter.containsKey(index)) {
                 mapOptions.put(mapConverter.get(index), value);
             } else  {
-                if (verbose) consoleLogger.fatal("Invalid option : " + index);
+                if (verbose) devConsoleLogger.fatal("Invalid option : " + index);
                 throw new InvalidAliasKey();
             }
         }

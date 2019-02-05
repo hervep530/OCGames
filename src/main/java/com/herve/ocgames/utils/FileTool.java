@@ -1,7 +1,10 @@
 package com.herve.ocgames.utils;
 
 import com.herve.ocgames.core.PropertyHelper;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -12,8 +15,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FileTool {
-    private static Logger supportLogger = Logger.getLogger("support_file");
-    private static Logger devLogger = Logger.getLogger("development_file");
+
+    private static final Logger supportLogger = LogManager.getLogger("support_file");
+    private static final Logger devConsoleLogger = LogManager.getLogger("development_console");
+    private static final Logger dev = LogManager.getLogger("development_file");
+    private static boolean loggerInitialized = false;
+    private static final Level VALUE = Level.getLevel("VALUE");
+    private static final Level COMMENT = Level.getLevel("COMMENT");
+    private static final Level LOOP = Level.getLevel("LOOP");
+    private static Level debugVerbosity = Level.getLevel("WARN");
+
+    /**
+     * Get PropertyHelper core.debug value and if true, set debug level (VALUE / COMMENT / LOOP)
+     */
+    private static void initLogger(){
+        Configurator.setLevel(dev.getName(), debugVerbosity);
+        loggerInitialized = true;
+    }
 
     /**
      * Get a properties file in arrayList of String Array of 2 elements (one is the key, the 2nd is value)
@@ -22,6 +40,7 @@ public class FileTool {
      * @return
      */
     public static ArrayList<String[]> getArrayListFromFile(String fileName){
+        if ( ! loggerInitialized ) initLogger();
         ArrayList<String[]> properties = new ArrayList<String[]>();
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line;
@@ -56,6 +75,7 @@ public class FileTool {
     }
 
     public static String[][] getArrayFromFile(String fileName){
+        if ( ! loggerInitialized ) initLogger();
         ArrayList<String[]> alProperties = getArrayListFromFile(fileName);
         return (String[][]) alProperties.toArray();
     }
@@ -67,6 +87,7 @@ public class FileTool {
      * @return
      */
     public static Map<String,String> getMapFromFile(String fileName){
+        if ( ! loggerInitialized ) initLogger();
         Map<String, String> properties = new HashMap<>();
         String[][] filenameReplace = new String[][] {{"VAR_NAME",fileName}};
         // Using of try-without with autoclosable objet introduce with java 1.7

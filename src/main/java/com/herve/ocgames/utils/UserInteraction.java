@@ -1,7 +1,10 @@
 package com.herve.ocgames.utils;
 
 import com.herve.ocgames.core.PropertyHelper;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import java.util.InputMismatchException;
 import java.util.NoSuchElementException;
@@ -11,8 +14,22 @@ import java.util.regex.Pattern;
 public class UserInteraction {
 
     private static Scanner sc = new Scanner(System.in);
-    private static Logger supportLogger = Logger.getLogger("support_file");
-    private static Logger devLogger = Logger.getLogger("development_file");
+    private static final Logger supportLogger = LogManager.getLogger("support_file");
+    private static final Logger devConsoleLogger = LogManager.getLogger("development_console");
+    private static final Logger dev = LogManager.getLogger("development_file");
+    private static boolean loggerInitialized = false;
+    private static final Level VALUE = Level.getLevel("VALUE");
+    private static final Level COMMENT = Level.getLevel("COMMENT");
+    private static final Level LOOP = Level.getLevel("LOOP");
+    private static Level debugVerbosity = Level.getLevel("WARN");
+
+    /**
+     * Get PropertyHelper core.debug value and if true, set debug level (VALUE / COMMENT / LOOP)
+     */
+    private static void initLogger(){
+        Configurator.setLevel(dev.getName(), debugVerbosity);
+        loggerInitialized = true;
+    }
 
 
 
@@ -24,6 +41,7 @@ public class UserInteraction {
      * @return
      */
     public static int promptSelect(String category, String[] responses, boolean showResponse) {
+        if ( ! loggerInitialized ) initLogger();
         String[][] langSubstitutes = new String[][] {{"VAR_CATEGORY", category}};
         System.out.print(String.format(lang("select.title", langSubstitutes)));
         for (int i = 1; i <= responses.length; i++)
@@ -70,6 +88,7 @@ public class UserInteraction {
      * @return
      */
     public static String promptInput(String question, String patternInput, String color, boolean showResponse) {
+        if ( ! loggerInitialized ) initLogger();
         //System.out.print(String.format(question));
         UserInteraction.displayMessage(question, color);
         String strResponse;
@@ -97,6 +116,7 @@ public class UserInteraction {
 
 
     public static String promptInput(String question, String patternInput, String color, String specificRuleName, Integer[] ruleParameters, boolean showResponse) {
+        if ( ! loggerInitialized ) initLogger();
         //System.out.print(String.format(question));
         UserInteraction.displayMessage(question, color);
         String strResponse;

@@ -16,25 +16,19 @@ import java.util.regex.Pattern;
 public class StringTool {
 
     private static final Logger supportLogger = LogManager.getLogger("support_file");
+    private static final Logger devConsoleLogger = LogManager.getLogger("development_console");
     private static final Logger dev = LogManager.getLogger("development_file");
     private static boolean loggerInitialized = false;
-    private static boolean debug = false;
     private static final Level VALUE = Level.getLevel("VALUE");
     private static final Level COMMENT = Level.getLevel("COMMENT");
     private static final Level LOOP = Level.getLevel("LOOP");
-    private static Level debugVerbosity = Level.getLevel("VALUE");
+    private static Level debugVerbosity = Level.getLevel("WARN");
 
     /**
      * Get PropertyHelper core.debug value and if true, set debug level (VALUE / COMMENT / LOOP)
      */
     private static void initLogger(){
-        try {
-            debug = StringTool.match(PropertyHelper.config("core.debug"), "^([Tt]rue|[Yy]es|1)$");
-            // Here can be change debug verbosity (... < INFO < DEBUG < VALUE < COMMENT < LOOP < TRACE) - no debug = WARN
-            if (debug) Configurator.setLevel(dev.getName(), debugVerbosity);
-        } catch ( NullPointerException e) {
-            supportLogger.error("Can't get PropertyHelper core.debug value.")
-        }
+        Configurator.setLevel(dev.getName(), debugVerbosity);
         loggerInitialized = true;
     }
 
