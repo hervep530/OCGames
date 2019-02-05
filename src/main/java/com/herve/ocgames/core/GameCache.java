@@ -7,6 +7,10 @@ package com.herve.ocgames.core;
 
 import com.herve.ocgames.utils.FileTool;
 import com.herve.ocgames.utils.StringTool;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -37,8 +41,13 @@ public class GameCache {
     private static boolean winner;
     private static boolean looser;
     private static boolean fatalError = true;
+
     private static boolean debug = false;
-    private static int debugVerbosity = 2 ;
+    private static final Level VALUE = Level.getLevel("VALUE");
+    private static final Level COMMENT = Level.getLevel("COMMENT");
+    private static final Level LOOP = Level.getLevel("LOOP");
+    private static Level debugVerbosity = Level.getLevel("VALUE");
+    private static final Logger dev = LogManager.getLogger(GameCache.class.getName());
 
     /**
      * Do the same work as a constructor
@@ -46,6 +55,7 @@ public class GameCache {
      */
     public static void initialize(int modeId){
         try {
+            initLogger();
             challenger = false;
             defender = false;
             winner = false;
@@ -54,11 +64,11 @@ public class GameCache {
             gameName = PropertyHelper.config("game.name");
             gameVersion = PropertyHelper.config("game.version");
             currentTurn = 0;
-            debugV2(gameName + " - " + gameVersion + " - Prochain tour : " + currentTurn);
+            dev.log(VALUE,gameName + " - " + gameVersion + " - Prochain tour : " + currentTurn);
             playerCode = "";
             computerCode = "";
             // importStrategiesFromFile();  // kept as backup (works but only implemented for one version... and complex)
-            debugV2("Nombre de tours à jouer : " + PropertyHelper.config("game.attempts"));
+            dev.log(VALUE,"Nombre de tours à jouer : " + PropertyHelper.config("game.attempts"));
             computerAttemptsRepository = new String[Integer.parseInt(PropertyHelper.config("game.attempts"))];
             playerAttemptsRepository = new String[Integer.parseInt(PropertyHelper.config("game.attempts"))];
             computerEvaluationsRepository = new String[Integer.parseInt(PropertyHelper.config("game.attempts"))];
@@ -70,6 +80,16 @@ public class GameCache {
             return;
         }
     }
+
+    /**
+     * Get PropertyHelper core.debug value and if true, set debug level (VALUE / COMMENT / LOOP)
+     */
+    private static void initLogger(){
+        debug = StringTool.match(PropertyHelper.config("core.debug"), "^([Tt]rue|[Yy]es|1)$");
+        // Here can be change debug verbosity (... < INFO < DEBUG < VALUE < COMMENT < LOOP < TRACE) - no debug = WARN
+        if (debug) Configurator.setLevel(dev.getName(), debugVerbosity);
+    }
+
 
     /*
      * Getters and setters
@@ -248,21 +268,5 @@ public class GameCache {
         };
     }
      */
-
-    // debug when verbosity level is equal to 1 - Should be used to exceptionnaly log debug message in the console
-    //private static void debugV1(String message){ if (debug && debugVerbosity > 0) devConsoleLogger.debug(message); }
-
-    private static void debugV2(String message){
-        // debug when verbosity level is up to 2 - Should be used to log computed value in file
-        if (debug && debugVerbosity > 1) devLogger.debug(message);
-    }
-
-    private static void debugV3(String message){
-        // debug when verbosity level is up to 3 - Should be used to log message as comment in the code
-        if (debug && debugVerbosity > 2) devLogger.debug(message);
-    }
-
-    // debug when verbosity level is up to 4 - Should be exceptionnaly used to log computed value in loop
-    //private static void debugV4(String message){ if (debug && debugVerbosity > 3) devLogger.debug(message); }
 
 }

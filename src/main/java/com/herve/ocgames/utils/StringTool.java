@@ -1,18 +1,42 @@
 package com.herve.ocgames.utils;
 
+import com.herve.ocgames.core.PropertyHelper;
 import com.herve.ocgames.core.exceptions.InvalidDigitParametersForMatchingMethod;
 import com.herve.ocgames.core.exceptions.InvalidInputStringForMatchingMethod;
 import com.herve.ocgames.core.exceptions.InvalidPatternForMatchingMethod;
 import com.herve.ocgames.core.exceptions.InvalidRuleNameForMatchingMethod;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringTool {
 
-    private static Logger supportLogger = Logger.getLogger("support_file");
-    private static Logger devLogger = Logger.getLogger("development_file");
+    private static final Logger supportLogger = LogManager.getLogger("support_file");
+    private static final Logger dev = LogManager.getLogger("development_file");
+    private static boolean loggerInitialized = false;
+    private static boolean debug = false;
+    private static final Level VALUE = Level.getLevel("VALUE");
+    private static final Level COMMENT = Level.getLevel("COMMENT");
+    private static final Level LOOP = Level.getLevel("LOOP");
+    private static Level debugVerbosity = Level.getLevel("VALUE");
+
+    /**
+     * Get PropertyHelper core.debug value and if true, set debug level (VALUE / COMMENT / LOOP)
+     */
+    private static void initLogger(){
+        try {
+            debug = StringTool.match(PropertyHelper.config("core.debug"), "^([Tt]rue|[Yy]es|1)$");
+            // Here can be change debug verbosity (... < INFO < DEBUG < VALUE < COMMENT < LOOP < TRACE) - no debug = WARN
+            if (debug) Configurator.setLevel(dev.getName(), debugVerbosity);
+        } catch ( NullPointerException e) {
+            supportLogger.error("Can't get PropertyHelper core.debug value.")
+        }
+        loggerInitialized = true;
+    }
 
     /**
      * A tool for massive substitutions
@@ -21,6 +45,7 @@ public class StringTool {
      * @return String after all substitutions
      */
     public static String arrayReplace(String inputString, String[][] arraySubstitutions) {
+        if ( ! loggerInitialized ) initLogger();
         if (arraySubstitutions == null) return inputString;
         String newStringValue = inputString;
         for (String[] substitution : arraySubstitutions) {
@@ -36,16 +61,17 @@ public class StringTool {
      * @return true if matches, else false
      */
     public static boolean match(String inputString, String referencePattern) {
+        if ( ! loggerInitialized ) initLogger();
         if ( referencePattern == null ){
-            devLogger.fatal("You can't use match method with null referencePattern");
+            supportLogger.fatal("You can't use match method with null referencePattern");
             throw new InvalidPatternForMatchingMethod();
         }
         if ( referencePattern.contentEquals("") ){
-            devLogger.fatal("You can't use match method with empty referencePattern");
+            supportLogger.fatal("You can't use match method with empty referencePattern");
             throw new InvalidPatternForMatchingMethod();
         }
         if (inputString == null) {
-            devLogger.fatal("You can't use match method with null inputString");
+            supportLogger.fatal("You can't use match method with null inputString");
             throw new InvalidInputStringForMatchingMethod();
         }
         Pattern p = Pattern.compile(referencePattern);
@@ -63,17 +89,18 @@ public class StringTool {
     public static boolean matchSpecificDigitRule (String inputString, String ruleName,Integer[] numericParameters){
         // default value
         boolean isMatching = true;
+        if ( ! loggerInitialized ) initLogger();
 
         if ( ruleName == null ){
-            devLogger.fatal("You can't use matchSpecificDigitRule method with null ruleName");
+            supportLogger.fatal("You can't use matchSpecificDigitRule method with null ruleName");
             throw new InvalidRuleNameForMatchingMethod();
         }
         if (inputString == null) {
-            devLogger.fatal("You can't use matchSpecificDigitRule method with null inputString");
+            supportLogger.fatal("You can't use matchSpecificDigitRule method with null inputString");
             throw new InvalidInputStringForMatchingMethod();
         }
         if (! match(inputString, "^[0-9]{1,}$")){
-            devLogger.fatal("You can't use matchSpecificDigitRule method if inputString doesn't contain only digits");
+            supportLogger.fatal("You can't use matchSpecificDigitRule method if inputString doesn't contain only digits");
             throw new InvalidInputStringForMatchingMethod();
         }
 
@@ -90,11 +117,11 @@ public class StringTool {
                     minRepeat = numericParameters[1];
                     maxRepeat = numericParameters[2];
                 } catch (ArrayIndexOutOfBoundsException e){
-                    devLogger.fatal("Array of parameters must be Integer[3]{nbDigits, minRepeat, maxRepeat}");
+                    supportLogger.fatal("Array of parameters must be Integer[3]{nbDigits, minRepeat, maxRepeat}");
                     throw new InvalidDigitParametersForMatchingMethod();
                 }
                 if ((nbDigits > 10 || nbDigits < 1) | (maxRepeat < 1 || minRepeat > maxRepeat || minRepeat < 0)) {
-                    devLogger.fatal("Mandatory : parameter 1 nbDigits <= 10 && parameter 3 maxRepeat >=  parameter 2 minRepeat");
+                    supportLogger.fatal("Mandatory : parameter 1 nbDigits <= 10 && parameter 3 maxRepeat >=  parameter 2 minRepeat");
                     throw new InvalidDigitParametersForMatchingMethod();
                 }
                 // and other variables
@@ -111,7 +138,7 @@ public class StringTool {
                 }
                 break;
             default:
-                devLogger.fatal("You can't use matchSpecificDigitRule method with undefined ruleName");
+                supportLogger.fatal("You can't use matchSpecificDigitRule method with undefined ruleName");
                 throw new InvalidRuleNameForMatchingMethod();
         }
         return isMatching;
