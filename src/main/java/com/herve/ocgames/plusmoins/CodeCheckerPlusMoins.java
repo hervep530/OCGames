@@ -12,7 +12,8 @@ public class CodeCheckerPlusMoins extends CodeChecker {
 
     public CodeCheckerPlusMoins(){
         super();
-        this.debugVerbosity = 2 ;
+        debugVerbosity = VALUE;
+        initLogger();
     }
 
     @Override
@@ -24,7 +25,7 @@ public class CodeCheckerPlusMoins extends CodeChecker {
         String result = "";
         Response computerResponse = new Response();
 
-        debugV3("error management if arguments are wrong"); // comment used for debug
+        dev.log(COMMENT,"error management if arguments are wrong");
         if (! StringTool.match(attempt, "^[0-" + (this.digitsInGame - 1) + "]{" + this.codeLength + "}$" ))
             invalidArgument("generateEvaluation","attempt");
         if (! StringTool.match(secret, "^[0-" + (this.digitsInGame - 1) + "]{" + this.codeLength + "}$" ))
@@ -32,17 +33,17 @@ public class CodeCheckerPlusMoins extends CodeChecker {
 
         if (GameCache.isFailed()) return computerResponse;
 
-        debugV3("The two strings are compared and return evaluation with symbols -+="); // comment used for debug
+        dev.log(COMMENT,"The two strings are compared and return evaluation with symbols -+=");
         for (int i=0 ; i < this.codeLength; i++) {
-            debugV4("Compare one by one each digit from secret code with input"); // comment used for debug
+            dev.log(LOOP,"Compare one by one each digit from secret code with input");
             testedNum = (int) attempt.charAt(i);
             expectedNum = (int) secret.charAt(i);
             String compare = ((testedNum == expectedNum) ? "=" : ((testedNum > expectedNum) ? "-" : "+"));
             result += compare;
         }
-        debugV2(lang("debug.plusmoinsComputerEvaluation") + result);
+        dev.log(VALUE,lang("debug.plusmoinsComputerEvaluation") + result);
 
-        debugV3("We return response after setting message, isSuccess and in values <\"evaluation\", result>");
+        dev.log(COMMENT,"We return response after setting message, isSuccess and in values <\"evaluation\", result>");
         computerResponse.appendValue("evaluation", result);
         String[][] langSubstitutes = new String[][] {{"VAR_RESULT_EVALUATION",result}};
         computerResponse.setMessage(lang("game.resultComputerEvaluation", langSubstitutes));
@@ -61,10 +62,10 @@ public class CodeCheckerPlusMoins extends CodeChecker {
         String codePattern = "^[-\\+=]{" + this.codeLength + "}$";
         Response response = new Response();
 
-        debugV3("Get player input with UserInteraction scanner"); // comment used for degug
+        dev.log(COMMENT,"Get player input with UserInteraction scanner");
         String evaluation = UserInteraction.promptInput(question, codePattern, color, false);
 
-        debugV3("Set response properties and return response"); // comment used for degug
+        dev.log(COMMENT,"Set response properties and return response");
         response.appendValue("evaluation", evaluation);
         return response;
     }
@@ -79,7 +80,7 @@ public class CodeCheckerPlusMoins extends CodeChecker {
         String[][] langSubstitutes = new String[][] {{"VAR_PLAYER_EVALUATION", submittedEvaluation},
                 {"VAR_REFEREE_EVALUATION", refereeEvaluation}};
 
-        debugV3("error management if arguments are wrong"); // comment used for debug
+        dev.log(COMMENT,"error management if arguments are wrong");
         if (! StringTool.match(submittedEvaluation, "^[-=+]{" + this.codeLength + "}$" ))
             invalidArgument("askRefereeControl","submittedEvaluation");
         if (! StringTool.match(refereeEvaluation, "^[-=+]{" + this.codeLength + "}$" ))
@@ -88,15 +89,15 @@ public class CodeCheckerPlusMoins extends CodeChecker {
         if (GameCache.isFailed()) return response;
 
 
-        debugV3("following result, set message and success in response and return response"); // comment used for debug
+        dev.log(COMMENT,"following result, set message and success in response and return response");
         if (! submittedEvaluation.contentEquals(refereeEvaluation)) {
-            debugV3("Player didn't give the right evaluation"); // comment used for debug
+            dev.log(COMMENT,"Player didn't give the right evaluation"); // comment used for debug
             message += lang("game.refereeWrongEvaluation",langSubstitutes);
             response.setSuccess(false);
         } else {
             boolean computerFindCode = StringTool.match(refereeEvaluation,"^={" + this.codeLength + "}$");
             if ( computerFindCode ) {
-                debugV3("Referee confirm that computer find the secret code"); // comment used for debug
+                dev.log(COMMENT,"Referee confirm that computer find the secret code");
                 message += "%n"  + lang("game.computerFoundCode");
                 response.setSuccess(false);
             }

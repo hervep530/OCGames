@@ -4,6 +4,10 @@ import com.herve.ocgames.core.interfaces.CodeGeneratorInterface;
 import com.herve.ocgames.utils.Response;
 import com.herve.ocgames.utils.StringTool;
 import com.herve.ocgames.utils.UserInteraction;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import static com.herve.ocgames.Main.*;
 
@@ -12,9 +16,16 @@ public abstract class CodeGenerator implements CodeGeneratorInterface {
     protected int codeLength;
     protected int digitsInGame;
     protected int digitMaxRepeat;
-    protected boolean debug = false;
-    protected int debugVerbosity;
     protected String[][] argumentSubstitutes;
+
+    protected boolean debug = false;
+    protected static final Level VALUE = Level.getLevel("VALUE");
+    protected static final Level COMMENT = Level.getLevel("COMMENT");
+    protected static final Level LOOP = Level.getLevel("LOOP");
+    protected static Level debugVerbosity = Level.getLevel("VALUE");
+    protected static final String loggerName = CodeGenerator.class.getName();
+    protected static final Logger dev = LogManager.getLogger(CodeGenerator.class.getName());
+
 
     /*
      * Constructor
@@ -24,8 +35,6 @@ public abstract class CodeGenerator implements CodeGeneratorInterface {
         codeLength = Integer.parseInt(PropertyHelper.config("game.codeLength"));
         digitsInGame = Integer.parseInt(PropertyHelper.config("game.digitsInGame"));
         digitMaxRepeat = Integer.parseInt(PropertyHelper.config("game.digitMaxRepeat"));
-        this.debug = StringTool.match(PropertyHelper.config("core.debug"), "^([Tt]rue|[Yy]es|1)$");
-        this.debugVerbosity = 2;
     }
 
     public CodeGenerator(String code) {
@@ -33,9 +42,19 @@ public abstract class CodeGenerator implements CodeGeneratorInterface {
         GameCache.setComputerCode(code);
     }
 
+
     /*
      * Shortcut, utilities to access PropertyHelper language keys
      */
+
+    /**
+     * Get PropertyHelper core.debug value and if true, set debug level (VALUE / COMMENT / LOOP)
+     */
+    protected void initLogger(){
+        this.debug = StringTool.match(PropertyHelper.config("core.debug"), "^([Tt]rue|[Yy]es|1)$");
+        // Here can be change debug verbosity (... < INFO < DEBUG < VALUE < COMMENT < LOOP < TRACE) - no debug = WARN
+        if (this.debug) Configurator.setLevel(loggerName, debugVerbosity);
+    }
 
     protected String lang(String key){
         return PropertyHelper.language(key);
@@ -86,13 +105,13 @@ public abstract class CodeGenerator implements CodeGeneratorInterface {
         String codePattern = "[0-" + (this.digitsInGame -1) + "]{" + this.codeLength + "}";
         Integer[] digitParameters = new Integer[]{this.digitsInGame,0,this.digitMaxRepeat};
 
-        debugV3("Get player input with UserInteraction scanner");
+        dev.log(COMMENT,"Get player input with UserInteraction scanner");
         String code = "";
         code = UserInteraction.promptInput(question, codePattern, "reset", "digitMaxRepeat",
                 digitParameters, false);
-        debugV2(lang("debug.logPlayerCode"));
+        dev.log(COMMENT,lang("debug.logPlayerCode"));
 
-        debugV3("store the player code in GameCache and return null because we don't need response");
+        dev.log(COMMENT,"store the player code in GameCache and return null because we don't need response");
         GameCache.setPlayerCode(code);
         return null;
     }
@@ -113,18 +132,18 @@ public abstract class CodeGenerator implements CodeGeneratorInterface {
         String[][] questionSubstitutes =  new String[][] {{"VAR_CODE_LENGTH", Integer.toString(this.codeLength)}};
         Integer[] digitParameters = new Integer[]{this.digitsInGame,0,this.digitMaxRepeat};
 
-        debugV3("Build prompt");
+        dev.log(COMMENT,"Build prompt");
         String question = this.displayResultFromPreviousAttempts(5);
         if (GameCache.turn() == 0) first = "First";
         question += lang("game.question" + first + "Attempt", questionSubstitutes);
 
-        debugV3("Get player input with UserInteraction scanner");
+        dev.log(COMMENT,"Get player input with UserInteraction scanner");
         String codePattern = "[0-9]{" + this.codeLength + "}";
         String code = "";
         code = UserInteraction.promptInput(question, codePattern, color, "digitMaxRepeat",
                 digitParameters, false);
 
-        debugV3("and store the code in GameCache");
+        dev.log(COMMENT,"and store the code in GameCache");
         GameCache.addPlayerAttempt(code);
         response.setMessage(lang("game.codeAttemptGiven"));
         return response;
@@ -140,24 +159,5 @@ public abstract class CodeGenerator implements CodeGeneratorInterface {
         supportLogger.fatal(lang("support.invalidArgument", this.argumentSubstitutes));
         GameCache.failure();
     }
-
-    protected void debugV1(String message){
-        // debug when verbosity level is equal to 1 - Should be used to exceptionnaly log debug message in the console
-        if (this.debug && this.debugVerbosity > 0) devConsoleLogger.debug(message);
-    }
-
-    protected void debugV2(String message){
-        // debug when verbosity level is up to 2 - Should be used to log computed value in file
-        if (this.debug && this.debugVerbosity > 1) devLogger.debug(message);
-    }
-
-    protected void debugV3(String message){
-        // debug when verbosity level is up to 3 - Should be used to log message as comment in the code
-        if (this.debug && this.debugVerbosity > 2) devLogger.debug(message);
-    }
-
-    // debug when verbosity level is up to 4 - Should be exceptionnaly used to log computed value in loop
-    //protected void debugV4(String message){ if (this.debug && this.debugVerbosity > 3) devLogger.debug(message); }
-
 
 }

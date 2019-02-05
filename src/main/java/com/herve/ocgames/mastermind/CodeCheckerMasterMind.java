@@ -6,6 +6,7 @@ import com.herve.ocgames.core.PropertyHelper;
 import com.herve.ocgames.utils.Response;
 import com.herve.ocgames.utils.StringTool;
 import com.herve.ocgames.utils.UserInteraction;
+import org.apache.logging.log4j.Level;
 
 public class CodeCheckerMasterMind extends CodeChecker {
 
@@ -15,7 +16,8 @@ public class CodeCheckerMasterMind extends CodeChecker {
 
     public CodeCheckerMasterMind(){
         super();
-        this.debugVerbosity = 2 ;
+        debugVerbosity = VALUE;
+        initLogger();
     }
 
     /*
@@ -37,7 +39,7 @@ public class CodeCheckerMasterMind extends CodeChecker {
         Response computerResponse = new Response();
         Integer[] digitParameters = new Integer[]{this.digitsInGame,0,this.digitMaxRepeat};
 
-        debugV3("error management with own exceptions"); // comment used for debug
+        dev.log(COMMENT,"error management with own exceptions"); // comment used for debug
         if (! StringTool.match(attempt, "^[0-" + (this.digitsInGame - 1) + "]{" + this.codeLength + "}$" ) ||
                 ! StringTool.matchSpecificDigitRule(attempt, "digitMaxRepeat", digitParameters))
             invalidArgument("generateEvaluation","attempt");
@@ -46,7 +48,7 @@ public class CodeCheckerMasterMind extends CodeChecker {
 
         if (GameCache.isFailed()) return computerResponse;
 
-        debugV3("The two strings are compared and return evaluation with symbols x and o"); // comment used for debug
+        dev.log(COMMENT,"The two strings are compared and return evaluation with symbols x and o");
         for (int i = 0; i < checkPosition.length(); i ++){
             if (checkPosition.charAt(i) == referencePosition.charAt(i)){
                 goodPositions += "x";
@@ -54,19 +56,19 @@ public class CodeCheckerMasterMind extends CodeChecker {
                 referencePresence = referencePresence.replaceFirst(String.valueOf(checkPosition.charAt(i)), "");
             }
         }
-        debugV2(lang("debug.mastermindGoodPosition") + goodPositions);
+        dev.log(VALUE,lang("debug.mastermindGoodPosition") + goodPositions);
         for (int i = 0; i < checkPresence.length(); i ++){
             if (referencePresence.contains(String.valueOf(checkPresence.charAt(i)))) {
                 presents += "o";
                 referencePresence = referencePresence.replaceFirst(String.valueOf(checkPresence.charAt(i)), "");
             }
         }
-        debugV2(lang("debug.mastermindWrongPosition") + presents);
+        dev.log(VALUE,lang("debug.mastermindWrongPosition") + presents);
 
-        debugV3("Sort symbols in evaluation string"); // comment used for debug
+        dev.log(COMMENT,"Sort symbols in evaluation string");
         result = goodPositions + presents;
 
-        debugV3("Set response properties and return response"); // comment used for debug
+        dev.log(COMMENT,"Set response properties and return response");
         computerResponse.appendValue("evaluation", result);
         computerResponse.appendValue("goodPosition", "" + goodPositions);
         computerResponse.appendValue("presents", "" + presents);
@@ -90,11 +92,11 @@ public class CodeCheckerMasterMind extends CodeChecker {
         String codePattern = "^[xo-]{0," + this.codeLength + "}$";
         Response response = new Response();
 
-        debugV3("Get player input with UserInteraction scanner"); // comment used for degug
+        dev.log(COMMENT,"Get player input with UserInteraction scanner");
         String evaluation = UserInteraction.promptInput(question, codePattern, color, false);
         evaluation = evaluation.replaceAll("-","");
 
-        debugV3("Set response properties and return response"); // comment used for degug
+        dev.log(COMMENT,"Set response properties and return response");
         response.appendValue("evaluation", evaluation);
         return response;
     }
@@ -111,7 +113,7 @@ public class CodeCheckerMasterMind extends CodeChecker {
         boolean isSimilarEvaluation = true;
         Integer[] digitParameters = new Integer[]{this.digitsInGame,0,this.digitMaxRepeat};
 
-        debugV3("error management if arguments are wrong"); // comment used for debug
+        dev.log(COMMENT,"error management if arguments are wrong");
         if (! StringTool.match(submittedEvaluation, "^[ox]{0," + this.codeLength + "}$" ))
             invalidArgument("askRefereeControl","submittedEvaluation");
         if (! StringTool.match(refereeEvaluation, "^[ox]{0," + this.codeLength + "}$" ))
@@ -119,7 +121,7 @@ public class CodeCheckerMasterMind extends CodeChecker {
 
         if (GameCache.isFailed()) return response;
 
-        debugV3("compare the two evalutions character by character to prevent different way of writing"); // comment used for debug
+        dev.log(COMMENT,"compare the two evalutions character by character to prevent different way of writing");
         playerString = submittedEvaluation.replaceAll("o", "");
         computerString = refereeEvaluation.replaceAll("o","");
         String goodPositions = "" + computerString.length();
@@ -133,15 +135,15 @@ public class CodeCheckerMasterMind extends CodeChecker {
                 {"VAR_RIGHT_POSITION", goodPositions},
                 {"VAR_WRONG_POSITION", presents}};
 
-        debugV3("following result, set message and success in response and return response"); // comment used for debug
+        dev.log(COMMENT,"following result, set message and success in response and return response");
         if (! isSimilarEvaluation) {
-            debugV3("Player didn't give the right evaluation"); // comment used for debug
+            dev.log(COMMENT,"Player didn't give the right evaluation");
             message += "%n" + lang("game.refereeWrongEvaluation", langSubstitutes);
             response.setSuccess(false);
         } else {
             boolean computerFindCode = StringTool.match(refereeEvaluation,"^x{" + this.codeLength + "}$");
             if ( computerFindCode ) {
-                debugV3("Referee confirm that computer find the secret code"); // comment used for debug
+                dev.log(COMMENT,"Referee confirm that computer find the secret code");
                 message += "%n"  + lang("game.computerFoundCode");
                 response.setSuccess(false);
             } else if ( ! computerFindCode && GameCache.turn() == (attempts - 1)) {
