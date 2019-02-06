@@ -39,11 +39,16 @@ public class StringTool {
      * @return String after all substitutions
      */
     public static String arrayReplace(String inputString, String[][] arraySubstitutions) {
+        // Check log and inputString and initialize variable
         if ( ! loggerInitialized ) initLogger();
         if (arraySubstitutions == null) return inputString;
         String newStringValue = inputString;
+        dev.log(VALUE,"Input String : " + inputString);
+
+        dev.log(COMMENT, "Loop to do replace");
         for (String[] substitution : arraySubstitutions) {
             newStringValue = newStringValue.replaceAll(substitution[0], substitution[1]);
+            dev.log(LOOP,"Substitution : " + substitution[0] + " replace by " + substitution[1]);
         }
         return newStringValue;
     }
@@ -86,15 +91,15 @@ public class StringTool {
         if ( ! loggerInitialized ) initLogger();
 
         if ( ruleName == null ){
-            supportLogger.fatal("You can't use matchSpecificDigitRule method with null ruleName");
+            supportLogger.fatal("matchSpecificDigitRule method used with null ruleName");
             throw new InvalidRuleNameForMatchingMethod();
         }
         if (inputString == null) {
-            supportLogger.fatal("You can't use matchSpecificDigitRule method with null inputString");
+            supportLogger.fatal("matchSpecificDigitRule method used with null inputString");
             throw new InvalidInputStringForMatchingMethod();
         }
         if (! match(inputString, "^[0-9]{1,}$")){
-            supportLogger.fatal("You can't use matchSpecificDigitRule method if inputString doesn't contain only digits");
+            supportLogger.fatal("matchSpecificDigitRule used with inputString doesn't contain only digits");
             throw new InvalidInputStringForMatchingMethod();
         }
 
@@ -111,7 +116,7 @@ public class StringTool {
                     minRepeat = numericParameters[1];
                     maxRepeat = numericParameters[2];
                 } catch (ArrayIndexOutOfBoundsException e){
-                    supportLogger.fatal("Array of parameters must be Integer[3]{nbDigits, minRepeat, maxRepeat}");
+                    supportLogger.fatal("Array of parameters is not relevant Integer[3]{nbDigits, minRepeat, maxRepeat}");
                     throw new InvalidDigitParametersForMatchingMethod();
                 }
                 if ((nbDigits > 10 || nbDigits < 1) | (maxRepeat < 1 || minRepeat > maxRepeat || minRepeat < 0)) {
@@ -132,7 +137,7 @@ public class StringTool {
                 }
                 break;
             default:
-                supportLogger.fatal("You can't use matchSpecificDigitRule method with undefined ruleName");
+                supportLogger.fatal("matchSpecificDigitRule method used with undefined ruleName");
                 throw new InvalidRuleNameForMatchingMethod();
         }
         return isMatching;

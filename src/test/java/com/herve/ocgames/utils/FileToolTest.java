@@ -1,7 +1,15 @@
 package com.herve.ocgames.utils;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.AppenderControl;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.LoggerConfig;
+import org.apache.logging.log4j.core.jmx.AppenderAdmin;
+import org.apache.logging.log4j.core.jmx.LoggerConfigAdmin;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,10 +24,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FileToolTest {
 
-    private static Logger consoleLogger = Logger.getLogger("development_console");
-    private static String devLogFile = "log/OCGames_developpement.log";
-    private static Level devLogLevel = Logger.getLogger("development_file").getLevel();
-    private static String supportLogFile = "log/OCGames.log";
+    private static final Logger consoleLogger = LogManager.getLogger("development_console");
+    private static final Level devLogLevel = LogManager.getLogger("development_file").getLevel();
+    private static final String devLogFile = "log/OCGames_developpement.log";
+    private static final String supportLogFile = "log/OCGames.log";
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 
     private void clearDevelopmentLog(){
@@ -60,24 +68,30 @@ class FileToolTest {
 
     @BeforeEach
     public void setUpStreams() {
+        final LoggerContext context = LoggerContext.getContext(false);
+        final Configuration config = context.getConfiguration();
+        Appender devFileAppender = config.getAppender("devFile");
         clearDevelopmentLog();
-        Logger.getRootLogger().addAppender(Logger.getLogger("development_file").getAppender("devFile"));
-        Logger.getLogger("support_file").addAppender(Logger.getLogger("development_file").getAppender("devFile"));
-        Logger.getLogger("development_file").setLevel(Level.DEBUG);
+        ((org.apache.logging.log4j.core.Logger) LogManager.getRootLogger()).addAppender(devFileAppender);
+        ((org.apache.logging.log4j.core.Logger) LogManager.getLogger("support_file")).addAppender(devFileAppender);
+        ((org.apache.logging.log4j.core.Logger) LogManager.getLogger("development_file")).setLevel(Level.DEBUG);
         System.setOut(new PrintStream(outContent));
     }
 
     @AfterEach
     public void restoreStreams() {
-        Logger.getRootLogger().removeAppender(Logger.getLogger("development_file").getAppender("devFile"));
-        Logger.getLogger("support_file").removeAppender(Logger.getLogger("development_file").getAppender("devFile"));
-        Logger.getLogger("development_file").setLevel(devLogLevel);
+        final LoggerContext context = LoggerContext.getContext(false);
+        final Configuration config = context.getConfiguration();
+        Appender devFileAppender = config.getAppender("devFile");
+        ((org.apache.logging.log4j.core.Logger) LogManager.getRootLogger()).removeAppender(devFileAppender);
+        ((org.apache.logging.log4j.core.Logger) LogManager.getLogger("support_file")).removeAppender(devFileAppender);
+        ((org.apache.logging.log4j.core.Logger) LogManager.getLogger("development_file")).setLevel(devLogLevel);
         System.setOut(System.out);
     }
 
     @Test
     void Given_FileDoesntExist_When_GetArrayListFromFile_Then_ArrayListIsNullAndLogFileError(){
-        ArrayList<String[]> properties = FileTool.getArrayListFromFile("file_doesnt_exist.properties");
+        ArrayList<String[]> properties = FileTool.getArrayListFromFile("file_doesnrt_exist.properties");
         assertTrue(logFound("File file_doesnt_exist.properties doesn't exist", devLogFile));
         assertTrue(properties == null);
     }
