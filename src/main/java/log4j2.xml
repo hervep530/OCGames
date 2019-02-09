@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+  <CustomLevels>
+    <CustomLevel name="VALUE" intLevel="510" />
+    <CustomLevel name="COMMENT" intLevel="530" />
+    <CustomLevel name="LOOP" intLevel="550" />
+  </CustomLevels>
+  <Appenders>
+    <Console name="console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p %F:%L - %m%n"/>
+    </Console>
+    <File name="supportFile" fileName="log/OCGames.log">
+      <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p %F:%L - %m%n"/>
+    </File>
+    <File name="developmentFile" fileName="log/OCGames_developpement.log">
+      <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p %F:%L - %m%n"/>
+    </File>
+    <File name="testFile" fileName="log/OCGames_test.log">
+      <PatternLayout pattern="%d %-7level %logger{36} - %msg%n"/>
+    </File>
+  </Appenders>
+  <Loggers>
+    <logger name="test_file" level="WARN" additivity="false">
+      <appender-ref ref="testFile" />
+    </logger>
+    <logger name="development_file" level="WARN" additivity="false">
+      <appender-ref ref="developmentFile" />
+    </logger>
+    <logger name="development_console" level="WARN" additivity="false">
+      <appender-ref ref="console" />
+    </logger>
+    <logger name="com.herve.ocgames.core.AppController" level="WARN" additivity="false">
+      <appender-ref ref="developmentFile" />
+    </logger>
+    <logger name="com.herve.ocgames.core.CodeChecker" level="WARN" additivity="false">
+      <appender-ref ref="developmentFile" />
+    </logger>
+    <logger name="com.herve.ocgames.core.CodeGenerator" level="WARN" additivity="false">
+      <appender-ref ref="developmentFile" />
+    </logger>
+    <logger name="com.herve.ocgames.core.Game" level="WARN" additivity="false">
+      <appender-ref ref="developmentFile" />
+    </logger>
+    <logger name="com.herve.ocgames.core.GameCache" level="WARN" additivity="false">
+      <appender-ref ref="developmentFile" />
+    </logger>
+    <logger name="com.herve.ocgames.core.Player" level="WARN" additivity="false">
+      <appender-ref ref="developmentFile" />
+    </logger>
+    <logger name="com.herve.ocgames.core.PropertyHelper" level="WARN" additivity="false">
+      <appender-ref ref="developmentFile" />
+    </logger>
+    <logger name="com.herve.ocgames.mastermind.CodeCheckerMasterMind" level="WARN" additivity="false">
+      <appender-ref ref="developmentFile" />
+    </logger>
+    <logger name="com.herve.ocgames.mastermind.CodeGeneratorMasterMind" level="WARN" additivity="false">
+      <appender-ref ref="developmentFile" />
+    </logger>
+    <logger name="com.herve.ocgames.mastermind.DigitToolMasterMind" level="WARN" additivity="false">
+      <appender-ref ref="developmentFile" />
+    </logger>
+    <logger name="com.herve.ocgames.plusmoins.CodeCheckerPlusMoins" level="WARN" additivity="false">
+      <appender-ref ref="developmentFile" />
+    </logger>
+    <logger name="com.herve.ocgames.plusmoins.CodeGeneratorPlusMoins" level="WARN" additivity="false">
+      <appender-ref ref="developmentFile" />
+    </logger>
+    <logger name="com.herve.ocgames.utils.FileTool" level="WARN" additivity="false">
+      <appender-ref ref="developmentFile" />
+    </logger>
+    <logger name="com.herve.ocgames.utils.MapTool" level="WARN" additivity="false">
+      <appender-ref ref="developmentFile" />
+    </logger>
+    <logger name="com.herve.ocgames.utils.StringTool" level="WARN" additivity="false">
+      <appender-ref ref="developmentFile" />
+    </logger>
+    <logger name="com.herve.ocgames.utils.UserInteraction" level="WARN" additivity="false">
+      <appender-ref ref="developmentFile" />
+    </logger>
+    <logger name="support" level="WARN" additivity="false">
+      <appender-ref ref="supportFile" />
+    </logger>
+    <Root level="error">
+      <AppenderRef ref="console"/>
+    </Root>
+  </Loggers>
+</Configuration>
