@@ -102,20 +102,19 @@ public class Game implements GameInterface {
     }
 
     /**
-     * Only a shortcut to access language getter in PropertyHelper
-     * @param key language key to get from PropertyHelper
-     * @return language string value from PropertyHelper
+     * Shortcut to get PropertyHelper languages values (messages)
+     * @param key (message key as String)
+     * @return message in choosen language
      */
     private static String lang(String key){
         return PropertyHelper.language(key);
     }
 
     /**
-     * Overloaded version of the previous method, giving the key and array substitution{{"VAR_SEARCH","string replace"},...}
-     * compose a string from PropertyHelper language value with dynamic data
-     * @param key PropertyHelper language key
-     * @param arraySubstitutions array String[][] {{"VAR_SEARCH","string replace"},...}
-     * @return a String, messages, log,...
+     * Shortcut to get PropertyHelper languages values (messages)
+     * @param key (message key as String)
+     * @param arraySubstitutions 2 dimensions array to substitute string array[i][0] by array[i][1]
+     * @return message in choosen language
      */
     private static String lang(String key, String[][] arraySubstitutions){
         return PropertyHelper.language(key, arraySubstitutions);

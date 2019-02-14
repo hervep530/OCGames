@@ -56,10 +56,21 @@ public abstract class CodeGenerator implements CodeGeneratorInterface {
         if (this.debug) Configurator.setLevel(loggerName, debugVerbosity);
     }
 
+    /**
+     * Shortcut to get PropertyHelper languages values (messages)
+     * @param key (message key as String)
+     * @return message in choosen language
+     */
     protected String lang(String key){
         return PropertyHelper.language(key);
     }
 
+    /**
+     * Shortcut to get PropertyHelper languages values (messages)
+     * @param key (message key as String)
+     * @param arraySubstitutions 2 dimensions array to substitute string array[i][0] by array[i][1]
+     * @return message in choosen language
+     */
     protected String lang(String key, String[][] arraySubstitutions){
         return PropertyHelper.language(key, arraySubstitutions);
     }

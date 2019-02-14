@@ -40,6 +40,7 @@ public abstract class Player implements PlayerInterface {
         if (this.debug) Configurator.setLevel(dev.getName(), debugVerbosity);
     }
 
+    @Override
     public void submitSecretCode(){
         if (GameCache.isFailed()) return;
 
@@ -48,6 +49,7 @@ public abstract class Player implements PlayerInterface {
         UserInteraction.displayMessage("%n");
     }
 
+    @Override
     public void letComputerGenerateSecretCode(){
         if (GameCache.isFailed()) return;
 
@@ -55,6 +57,7 @@ public abstract class Player implements PlayerInterface {
         if (GameCache.getComputerCode().contentEquals("")) this.codeGenerator.generateRandom();
     }
 
+    @Override
     public void submitAttempt(){
         if (GameCache.isFailed()) return;
         String color = "reset";
@@ -65,6 +68,7 @@ public abstract class Player implements PlayerInterface {
         if ( ! GameCache.isFailed() ) UserInteraction.displayMessage(response, color);
     }
 
+    @Override
     public void getComputerEvaluation(){
         if (GameCache.isFailed()) return;
         String color = "reset";
@@ -80,6 +84,7 @@ public abstract class Player implements PlayerInterface {
         UserInteraction.displayMessage(response, color);
     }
 
+    @Override
     public void getComputerAttempt() {
         if (GameCache.isFailed()) return;
 
@@ -90,6 +95,7 @@ public abstract class Player implements PlayerInterface {
         if ( ! GameCache.isFailed() ) UserInteraction.displayMessage(response, color);
     }
 
+    @Override
     public void submitEvaluation(){
         if (GameCache.isFailed()) return;
         String color = "reset";
