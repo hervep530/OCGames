@@ -89,10 +89,12 @@ public class Text {
         String result = text;
         String effect;
         if (color == null) return text;
+        // if color is valid, display text with custom color, else display text with default color (RESET)
         try {
             effect = Text.class.getDeclaredField(color.toUpperCase() + "_COLOR").get(null).toString();
             result = effect + text + RESET;
         } catch (NoSuchFieldException | IllegalAccessException e) {
+            // invalid color
             return text;
         }
         return result;
@@ -108,11 +110,13 @@ public class Text {
         String result = text;
         String effect;
         if (color == null) return text;
+        // if effect is valid (color_type), display text with custom effect, else display text with default color
         try {
             String effectReference = color.toUpperCase() + "_" + type.toUpperCase();
             effect = Text.class.getDeclaredField(effectReference).get(null).toString();
             result = effect + text + RESET;
         } catch (NoSuchFieldException | IllegalAccessException e) {
+            // invalid effect
             return text;
         }
         return result;
