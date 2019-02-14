@@ -67,6 +67,11 @@ public abstract class CodeChecker implements CodeCheckerInterface {
         return PropertyHelper.language(key, arraySubstitutions);
     }
 
+    /**
+     * Utility to log error and stop all game processes (with GameCache) when wrong arguments are given to methods
+     * @param method method name
+     * @param argument argument name
+     */
     protected void invalidArgument(String method, String argument){
         this.argumentSubstitutes = new String[][] {{"VAR_METHOD", method}, {"VAR_ARGUMENT", argument}};
         consoleLogger.fatal(lang("error.invalidArgument", this.argumentSubstitutes));

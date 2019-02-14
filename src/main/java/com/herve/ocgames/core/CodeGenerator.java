@@ -87,6 +87,18 @@ public abstract class CodeGenerator implements CodeGeneratorInterface {
         return message;
     }
 
+    /**
+     * Utility to log error and stop all game processes (with GameCache) when wrong arguments are given to methods
+     * @param method method name
+     * @param argument argument name
+     */
+    protected void invalidArgument(String method, String argument){
+        this.argumentSubstitutes = new String[][] {{"VAR_METHOD", method}, {"VAR_ARGUMENT", argument}};
+        consoleLogger.fatal(lang("error.invalidArgument", this.argumentSubstitutes));
+        supportLogger.fatal(lang("support.invalidArgument", this.argumentSubstitutes));
+        GameCache.failure();
+    }
+
     /*
      * Partie Metier
      */
@@ -147,17 +159,6 @@ public abstract class CodeGenerator implements CodeGeneratorInterface {
         GameCache.addPlayerAttempt(code);
         response.setMessage(lang("game.codeAttemptGiven"));
         return response;
-    }
-
-    /*
-     * Utilities to access log in different verbosity level
-     */
-
-    protected void invalidArgument(String method, String argument){
-        this.argumentSubstitutes = new String[][] {{"VAR_METHOD", method}, {"VAR_ARGUMENT", argument}};
-        consoleLogger.fatal(lang("error.invalidArgument", this.argumentSubstitutes));
-        supportLogger.fatal(lang("support.invalidArgument", this.argumentSubstitutes));
-        GameCache.failure();
     }
 
 }
