@@ -42,8 +42,9 @@ public class Language {
 
     /**
      * Load a default config to prevent lack of parameters
+     * @return default language as Map
      */
-    private static void getDefault() {
+    public static Map<String,String> getDefault() {
         languageRepository.put("application.quit", "Application is stopped.%n");
         languageRepository.put("select.title", "Choice VAR_CATEGORY%n");
         languageRepository.put("select.question", "What VAR_CATEGORY do you want to choose?%n");
@@ -111,6 +112,8 @@ public class Language {
         languageRepository.put("debug.plusmoinsComputerEvaluation", "Compare Player attempts and computer evaluation : ");
         languageRepository.put("debug.plusmoinsConcatAttemptEvaluation", "Prepare new attempt before substitution : ");
         languageRepository.put("debug.plusmoinsGenerateComputerAttempt", "New attempt after, it's ready : ");
+
+        return languageRepository;
     }
 
     /**

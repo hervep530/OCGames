@@ -4,6 +4,8 @@ import com.herve.ocgames.core.enums.ConfigEntry;
 import com.herve.ocgames.core.enums.ConfigMode;
 import com.herve.ocgames.core.enums.GameFromList;
 import com.herve.ocgames.core.enums.GameVersion;
+import com.herve.ocgames.core.recovery.Config;
+import com.herve.ocgames.core.recovery.Language;
 import com.herve.ocgames.utils.FileTool;
 import com.herve.ocgames.utils.MapTool;
 import com.herve.ocgames.utils.StringTool;
@@ -35,10 +37,11 @@ public class PropertyHelper {
      * For this static classe replace a constructor
      */
     public static void initialize(String[] cmdLineOptions){
-        defaultConfig();
+        configRepository = new HashMap<>(Config.getDefault());
         loadConfigFiles();
         importCommandLineOptions(cmdLineOptions);
         initLogger();
+        languageRepository = new HashMap<>(Language.getDefault());
         loadLanguageFiles();
     }
 
@@ -46,11 +49,11 @@ public class PropertyHelper {
      * For this static classe replace a constructor - Get default from an external HashMap instead of code below
      */
     public static void initialize(HashMap<String,String> defaultProperties, String[] cmdLineOptions) {
-        defaultConfig();                                        // hard parameters in the code
-        defaultConfig(defaultProperties);                       // additionnal parameters given in argument as Map
+        configRepository = new HashMap<>(defaultProperties);
         loadConfigFiles();                                      // parameters from resource file in core package
         importCommandLineOptions(cmdLineOptions);         // parameters from command line
         initLogger();
+        languageRepository = new HashMap<>(Language.getDefault());
         loadLanguageFiles();                                    // languages from resource file in core package
     }
 
@@ -119,44 +122,6 @@ public class PropertyHelper {
         String message = languageRepository.get(key);
         message = StringTool.arrayReplace(message, substitutions);
         return message;
-    }
-
-    /**
-     * Load a default config to prevent lack of parameters
-     */
-    private static void defaultConfig() {
-        // ConfigMode.STRICT is a config method locked with enums, ConfigMode.CUSTOM make parameters free and independent
-        configRepository.put("config.mode", ConfigMode.CUSTOM.toString());   // hard parameter (no change with file)
-        // core parameters
-        configRepository.put("core.debug", "0");
-        configRepository.put("core.language", "default");
-        // colors
-        configRepository.put("color.rules", "blue");
-        configRepository.put("color.defender", "cyan");
-        configRepository.put("color.challenger", "purple");
-        configRepository.put("color.winner", "green");
-        configRepository.put("color.looser", "red");
-        // default - plusmoins.config = "pm40x"
-        configRepository.put("plusmoins.version", "pm40x");
-        configRepository.put("plusmoins.codeLength", "4");
-        configRepository.put("plusmoins.digitsInGame", "10");
-        //configRepository.put("plusmoins.digitMaxRepeat", configRepository.get("plusmoins.codeLength"));
-        configRepository.put("plusmoins.attempts", "6");
-
-        // default - plusmoins.config = "pm46x"
-        configRepository.put("mastermind.version", "mm462");
-        configRepository.put("mastermind.codeLength", "4");
-        configRepository.put("mastermind.digitsInGame", "6");
-        //configRepository.put("mastermind.digitMaxRepeat", configRepository.get("mastermind.codeLength"));
-        configRepository.put("mastermind.attempts", "12");
-    }
-
-    /**
-     * Load default config from Hashmap
-     * @param defaultProperties HashMap contenant les propriétés par défaut
-     */
-    private static void defaultConfig(HashMap<String,String> defaultProperties) {
-        configRepository = new HashMap<>(defaultProperties);
     }
 
     /**

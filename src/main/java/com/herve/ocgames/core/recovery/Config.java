@@ -35,13 +35,14 @@ public class Config {
 
     /**
      * Load a default config to prevent lack of parameters
+     * @return default config as Map
      */
     public static Map<String,String> getDefault() {
         // ConfigMode.STRICT is a config method locked with enums, ConfigMode.CUSTOM make parameters free and independent
         configRepository.put("config.mode", ConfigMode.CUSTOM.toString());   // hard parameter (no change with file)
         // core parameters
         configRepository.put("core.debug", "0");
-        configRepository.put("core.language", "default");
+        configRepository.put("core.language", "en_EN");
         // colors
         configRepository.put("color.rules", "blue");
         configRepository.put("color.defender", "cyan");
