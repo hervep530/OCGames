@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class Config {
-    private static HashMap<String,String> languageRepository = new HashMap<String,String>();
+    private static HashMap<String,String> configRepository = new HashMap<String,String>();
 
     private static boolean debug = false;
     private static Level VALUE = Level.getLevel("VALUE");
@@ -38,23 +38,40 @@ public class Config {
      */
     public static Map<String,String> getDefault() {
         // ConfigMode.STRICT is a config method locked with enums, ConfigMode.CUSTOM make parameters free and independent
-        languageRepository.put("config.mode", ConfigMode.CUSTOM.toString());   // hard parameter (no change with file)
+        configRepository.put("config.mode", ConfigMode.CUSTOM.toString());   // hard parameter (no change with file)
         // core parameters
-        languageRepository.put("core.debug", "0");
-        languageRepository.put("core.language", "default");
+        configRepository.put("core.debug", "0");
+        configRepository.put("core.language", "default");
         // colors
-        languageRepository.put("", "");
+        configRepository.put("color.rules", "blue");
+        configRepository.put("color.defender", "cyan");
+        configRepository.put("color.challenger", "purple");
+        configRepository.put("color.winner", "green");
+        configRepository.put("color.looser", "red");
+        // default - plusmoins.config = "pm40x"
+        configRepository.put("plusmoins.version", "pm40x");
+        configRepository.put("plusmoins.codeLength", "4");
+        configRepository.put("plusmoins.digitsInGame", "10");
+        //configRepository.put("plusmoins.digitMaxRepeat", configRepository.get("plusmoins.codeLength"));
+        configRepository.put("plusmoins.attempts", "6");
 
-        return languageRepository;
+        // default - plusmoins.config = "pm46x"
+        configRepository.put("mastermind.version", "mm462");
+        configRepository.put("mastermind.codeLength", "4");
+        configRepository.put("mastermind.digitsInGame", "6");
+        //configRepository.put("mastermind.digitMaxRepeat", configRepository.get("mastermind.codeLength"));
+        configRepository.put("mastermind.attempts", "12");
+
+        return configRepository;
     }
 
 
     /**
-     * Display list of properties from HashMap
+     * Log list of properties from HashMap
      */
     public static void logDefault(){
         initLogger();
-        Map<String, String> sortedDefault = new TreeMap<>(languageRepository);
+        Map<String, String> sortedDefault = new TreeMap<>(configRepository);
         for (Map.Entry<String, String> entry : sortedDefault.entrySet()) {
             dev.log(LOOP, entry.getKey() + " : " + entry.getValue());
         }

@@ -105,6 +105,12 @@ public class PropertyHelper {
         return value;
     }
 
+    /**
+     * Kind of getter for languageReposity - overloaded to allow dynamic string in message
+     * @param key message key as string
+     * @param substitutions 2 dimensions array to substitute string array[i][0] by array[i][1]
+     * @return message as string
+     */
     public static String language(String key, String[][] substitutions){
         if ( ! languageRepository.containsKey(key) ){
             supportLogger.warn("PropertyHelper can't find language entry (message) with key " + key);
@@ -221,6 +227,9 @@ public class PropertyHelper {
         }
     }
 
+    /**
+     * Parse file resources/config.properties
+     */
     private static void loadConfigFiles(){
         // Import file resources/config.properties following rules defined by enum ConfigEntry
         String fileName = "resources/config.properties";
@@ -243,6 +252,11 @@ public class PropertyHelper {
 
     }
 
+    /**
+     * Parse file resources/language/language-CONFIG.properties where config is
+     * PropertyHelper.configRepository.get(core.language)
+     * Value of core.language is restricted by enum configEntry
+     */
     private static void loadLanguageFiles(){
         // Import file resources/language/language-CONFIG.properties (CONFIG is restricted with ConfigEntry)
         String fileName = "resources/language/language-" + configRepository.get("core.language") + ".properties";
@@ -328,6 +342,7 @@ public class PropertyHelper {
 
     /**
      * Given a key from languageRepository, get and display the message
+     * @param keyMessage key like "language.mymessage" as found in language file
      */
     public static void displayMessage(String keyMessage){
         if ( ! languageRepository.containsKey(keyMessage) ){
