@@ -80,7 +80,7 @@ public class AppController implements AppControllerInterface {
     }
 
     /**
-     * Lance le jeu choisi
+     * Launch choosen game
      * @return   quitAfterGame : retourne true pour quitter l'application après le jeu, false pour rester dans l'application
      */
     public boolean launchGame() {
