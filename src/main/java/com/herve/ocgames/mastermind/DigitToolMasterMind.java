@@ -99,10 +99,15 @@ public class DigitToolMasterMind {
      * Externalize Work for CodeGeneratorMasterMind
      */
 
+    /**
+     * Given the number of digit of the list return a list of digits as String
+     * @param nbDigit number of digits of the list
+     * @return string with concatenating all digits
+     */
     private String getDigitsSuite(int nbDigit){
         // this method is used to have constructor lighter as possible - arg is this.digitsInGame
         String digitsOut = "";
-        dev.log(COMMENT,"given the range [0-" + nbDigit +"], get all digits in a string"); // comment used for degug
+        dev.log(COMMENT,"given the range [0-" + (nbDigit - 1) +"], get all digits in a string"); // comment used for degug
         for (int i = 0 ; i < nbDigit; i++){
             digitsOut += "" + i;
         }
@@ -110,7 +115,11 @@ public class DigitToolMasterMind {
         return digitsOut;
     }
 
-
+    /**
+     * Given a string with digits, reorganize it randomly
+     * @param digitsIn String which enumerate list of digit
+     * @return a new string less predictible
+     */
     private String sortInputDigitsRandomly(String digitsIn){
         String digitsOut = "";
         dev.log(COMMENT,"given a String containing a list of digit " + digitsIn + ", reorganize it randomly"); // comment used for degug
@@ -123,6 +132,11 @@ public class DigitToolMasterMind {
         return digitsOut;
     }
 
+    /**
+     * it 's a part of CodeGeneratorMasterMind (method generateComputerAttempt) externalized to improve lisibility of
+     * the code. Compute and store some data from the previous "attempt + evalution"
+     * Like this, we identify digits present in the code, digits with right / wrong place, digits not yet tried
+     */
     void updateAfterFindingStrategy() {
         // Nothing to get at the first turn
         if (GameCache.turn() == 0) return;
