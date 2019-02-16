@@ -9,7 +9,7 @@ Petite application en mode console permettant le lancer 2 jeu :
 - Défenseur
 - Duel
 
-__Instruction d'installation et d'utilisation__ :
+__Instruction d'installation et d'utilisation__ : 
 1. Creer un repertoire, puis se positionner dans ce repertoire
 2. Cloner le repository OCGames (git clone https://github.com/hervep530/OCGames)
 3. Se positionner dans le repertoire OCGames
@@ -21,7 +21,8 @@ __Instruction d'installation et d'utilisation__ :
 Avant de relancer une éventuelle compilation, il est recommander de supprimer les fichiers .class
 
 
-__Configuration__ :
+__Configuration__ : 
+
 Un fichier de configuration config.properties placé dans le répertoire resources du projet, permet de modifier quelques paramètres.
 Entre autre, il est possible :
 - de (des)activer le mode debug avec : core.debug = [0|no|false|1|yes|true]
